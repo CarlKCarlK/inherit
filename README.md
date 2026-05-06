@@ -1,57 +1,58 @@
 # Rust "Inheritance" Example Roadmap
 
-Rust has no class inheritance, but it supports several inheritance-like mechanisms for behavior reuse, method resolution, and capability propagation.
+Rust has no class inheritance. Instead, it offers several smaller mechanisms that cover much of what inheritance is often used for: behavior reuse, method resolution, capability propagation, and polymorphism.
 
 ## Behavior Reuse
 
-1. `default_methods`  
-   File: `examples/default_methods.rs`  
-   Command: `cargo run --example default_methods`
+1. `1a_default_methods`  
+   File: `examples/1a_default_methods.rs`  
+   Command: `cargo run --example 1a_default_methods`
 
-2. `supertraits`  
-   File: `examples/supertraits.rs`  
-   Command: `cargo run --example supertraits`
+2. `1b_supertraits`  
+   File: `examples/1b_supertraits.rs`  
+   Command: `cargo run --example 1b_supertraits`
 
-3. `blanket_impls`  
-   File: `examples/blanket_impls.rs`  
-   Command: `cargo run --example blanket_impls`
+3. `1c_blanket_impls`  
+   File: `examples/1c_blanket_impls.rs`  
+   Command: `cargo run --example 1c_blanket_impls`
 
-4. `derive_reuse`  
-   File: `examples/derive_reuse.rs`  
-   Command: `cargo run --example derive_reuse`
+4. `1d_derive_reuse`  
+   File: `examples/1d_derive_reuse.rs`  
+   Command: `cargo run --example 1d_derive_reuse`  
+   Note: `derive` does not inherit behavior; it generates trait implementations.
 
 ## Method Resolution
 
-5. `deref_lookup`  
-   File: `examples/deref_lookup.rs`  
-   Command: `cargo run --example deref_lookup`
+5. `2a_deref_lookup`  
+   File: `examples/2a_deref_lookup.rs`  
+   Command: `cargo run --example 2a_deref_lookup`
 
-6. `trait_lookup_scope`  
-   File: `examples/trait_lookup_scope.rs`  
-   Command: `cargo run --example trait_lookup_scope`
+6. `2b_trait_lookup_scope`  
+   File: `examples/2b_trait_lookup_scope.rs`  
+   Command: `cargo run --example 2b_trait_lookup_scope`
 
-7. `extension_traits`  
-   File: `examples/extension_traits.rs`  
-   Command: `cargo run --example extension_traits`
+7. `2c_extension_traits`  
+   File: `examples/2c_extension_traits.rs`  
+   Command: `cargo run --example 2c_extension_traits`
 
-8. `ufcs_disambiguation`  
-   File: `examples/ufcs_disambiguation.rs`  
-   Command: `cargo run --example ufcs_disambiguation`
+8. `2d_ufcs_disambiguation`  
+   File: `examples/2d_ufcs_disambiguation.rs`  
+   Command: `cargo run --example 2d_ufcs_disambiguation`
 
-## Type Capability Propagation
+## Capability Propagation and Polymorphism
 
-9. `auto_traits`  
-   File: `examples/auto_traits.rs`  
-   Command: `cargo run --example auto_traits`
+9. `3a_auto_traits`  
+   File: `examples/3a_auto_traits.rs`  
+   Command: `cargo run --example 3a_auto_traits`
 
-10. `trait_objects`  
-    File: `examples/trait_objects.rs`  
-    Command: `cargo run --example trait_objects`
+10. `3b_trait_objects`  
+    File: `examples/3b_trait_objects.rs`  
+    Command: `cargo run --example 3b_trait_objects`
 
-11. `composition_delegation`  
-    File: `examples/composition_delegation.rs`  
-    Command: `cargo run --example composition_delegation`
+11. `3c_composition_delegation`  
+    File: `examples/3c_composition_delegation.rs`  
+    Command: `cargo run --example 3c_composition_delegation`
 
 ## Suggested Learning Order
 
-Run them in numeric order. The first four establish behavior reuse, the middle four explain how method calls resolve, and the last three show type-level propagation and runtime polymorphism.
+Run them in the order listed.
