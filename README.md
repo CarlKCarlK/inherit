@@ -27,17 +27,17 @@ Rust has no class inheritance. Instead, it offers several smaller mechanisms tha
    File: `examples/2a_deref_lookup.rs`  
    Command: `cargo run --example 2a_deref_lookup`
 
-6. `2b_trait_lookup_scope`  
-   File: `examples/2b_trait_lookup_scope.rs`  
-   Command: `cargo run --example 2b_trait_lookup_scope`
+6. `2b_extension_traits`  
+   File: `examples/2b_extension_traits.rs`  
+   Command: `cargo run --example 2b_extension_traits`
 
-7. `2c_extension_traits`  
-   File: `examples/2c_extension_traits.rs`  
-   Command: `cargo run --example 2c_extension_traits`
+7. `2c_ufcs_disambiguation`  
+   File: `examples/2c_ufcs_disambiguation.rs`  
+   Command: `cargo run --example 2c_ufcs_disambiguation`
 
-8. `2d_ufcs_disambiguation`  
-   File: `examples/2d_ufcs_disambiguation.rs`  
-   Command: `cargo run --example 2d_ufcs_disambiguation`
+8. `2d_constraint_gated_methods`  
+   File: `examples/2d_constraint_gated_methods.rs`  
+   Command: `cargo run --example 2d_constraint_gated_methods`
 
 ## Capability Propagation and Polymorphism
 
