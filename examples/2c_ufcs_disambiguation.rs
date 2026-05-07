@@ -24,7 +24,11 @@ impl Person {
 fn main() {
     let p = Person;
 
+    // Inherent method wins on plain dot-call.
     println!("{}", p.role());
+
+    // Universal Function Call Syntax (UFCS) disambiguates which trait method to call.
+    // If you avoid traits with the same method name, you usually do not need this.
     println!("{}", Pilot::role(&p));
     println!("{}", Wizard::role(&p));
 }

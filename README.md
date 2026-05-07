@@ -39,19 +39,17 @@ Rust has no class inheritance. Instead, it offers several smaller mechanisms tha
    File: `examples/2d_constraint_gated_methods.rs`  
    Command: `cargo run --example 2d_constraint_gated_methods`
 
-## Capability Propagation and Polymorphism
+## Runtime Polymorphism
 
-9. `3a_auto_traits`  
-   File: `examples/3a_auto_traits.rs`  
-   Command: `cargo run --example 3a_auto_traits`
+9. `3a_trait_objects`  
+   File: `examples/3a_trait_objects.rs`  
+   Command: `cargo run --example 3a_trait_objects`
 
-10. `3b_trait_objects`  
-    File: `examples/3b_trait_objects.rs`  
-    Command: `cargo run --example 3b_trait_objects`
+## Advanced Reuse Patterns
 
-11. `3c_composition_delegation`  
-    File: `examples/3c_composition_delegation.rs`  
-    Command: `cargo run --example 3c_composition_delegation`
+13. `4d_macro_generated_delegation`  
+    File: `examples/4d_macro_generated_delegation.rs`  
+    Command: `cargo run --example 4d_macro_generated_delegation`
 
 ## Suggested Learning Order
 
