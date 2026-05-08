@@ -76,5 +76,6 @@ fn main() {
     let player = ServoPlayerEsp;
 
     center_servo(&servo);
+    center_servo(&player); // `ServoPlayer` can do everything `Servo` can!
     run_wave(&player);
 }

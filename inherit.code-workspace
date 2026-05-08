@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../mcu/device-envoy"
+		},
+		{
+			"path": "../range-set-blaze"
+		}
+	],
+	"settings": {}
+}
