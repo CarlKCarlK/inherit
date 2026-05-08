@@ -6,6 +6,12 @@ struct RangeSetBlaze<T> {
 }
 
 impl<T: Ord + Copy> RangeSetBlaze<T> {
+    fn new() -> Self {
+        Self {
+            values: BTreeSet::new(),
+        }
+    }
+
     fn from_values(values: &[T]) -> Self {
         Self {
             values: values.iter().copied().collect(),
@@ -24,27 +30,24 @@ impl<T: Ord + Copy> RangeSetBlaze<T> {
 //
 // Faux-inheritance / "is-a" angle:
 // If a type `I` satisfies `IntoIterator<Item = &RangeSetBlaze<T>>`,
-// then `I` automatically "is a" `MultiwayRangeSetBlazeRef` and gets
+// then `I` automatically "is a" `IntoIterableOfRangeSetRefs` and gets
 // the `union` method with no per-type impl.
-trait MultiwayRangeSetBlazeRef<'a, T: 'a>: IntoIterator<Item = &'a RangeSetBlaze<T>> + Sized {
+trait IntoIterableOfRangeSetRefs<'a, T: 'a>: IntoIterator<Item = &'a RangeSetBlaze<T>> + Sized {
     fn union(self) -> RangeSetBlaze<T>
     where
         T: Ord + Copy + 'a,
     {
-        let mut it = self.into_iter();
-        let mut acc = it
-            .next()
-            .cloned()
-            .unwrap_or_else(|| RangeSetBlaze { values: BTreeSet::new() });
-
-        for set in it {
-            acc = acc.union(set);
+        let mut result = RangeSetBlaze::new();
+        for set in self {
+            result = result.union(set);
         }
-        acc
+        result
     }
 }
 
-impl<'a, T: 'a, I> MultiwayRangeSetBlazeRef<'a, T> for I where I: IntoIterator<Item = &'a RangeSetBlaze<T>> {}
+// Any type that can be turned into an iterator of &RangeSetBlaze<T>
+// automatically is-a IntoIterableOfRangeSetRefs.
+impl<'a, T: 'a, I> IntoIterableOfRangeSetRefs<'a, T> for I where I: IntoIterator<Item = &'a RangeSetBlaze<T>> {}
 
 fn main() {
     let a = RangeSetBlaze::from_values(&[1, 2, 3]);
