@@ -1,13 +1,6 @@
 # Puzzle 5
 
-We need one `Integer` abstraction used by many concrete types (numeric primitives, `char`, IPv4, IPv6). The contract stays the same, but we want to reuse implementation patterns so each concrete type does not hand-write the same method bodies.
-
-## Spec
-
-1. Every `Integer` type must provide `add_one`, `min_value`, and `max_value`.
-2. Many numeric subtypes should share one common implementation pattern.
-3. Some special subtypes (`char`, `IPv4`, `IPv6`) may use specialized implementations.
-4. All concrete types should still be `is-a Integer`.
+We want to treat 15 integer-like types from `u8` to `usize` to `i128` and `char` and `IPv4`, `IPv6` uniformly. For example, with a min, max, and ability to add one (unchecked).
 
 ```mermaid
 classDiagram
@@ -20,27 +13,35 @@ classDiagram
         +max_value()
     }
 
-    class NumericIntegerTypes {
+    class u8 {
         <<subclass group>>
-        +shared add_one/min/max behavior
+        +add_one()
+        +min_value()
+        +max_value()
     }
 
     class CharType {
         <<subclass>>
-        +special add_one/min/max behavior
+        +add_one()
+        +min_value()
+        +max_value()
     }
 
     class IPv4Type {
         <<subclass>>
-        +special add_one/min/max behavior
+        +add_one()
+        +min_value()
+        +max_value()
     }
 
     class IPv6Type {
         <<subclass>>
-        +special add_one/min/max behavior
+        +add_one()
+        +min_value()
+        +max_value()
     }
 
-    Integer <|-- NumericIntegerTypes : is-a
+    Integer <|-- u8 : is-a
     Integer <|-- CharType : is-a
     Integer <|-- IPv4Type : is-a
     Integer <|-- IPv6Type : is-a

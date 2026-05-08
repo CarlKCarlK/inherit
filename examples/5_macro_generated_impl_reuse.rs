@@ -92,6 +92,17 @@ impl Integer for char { impl_integer_ops_char!(); }
 impl Integer for Ipv4Addr { impl_integer_ops_ipv4!(); }
 impl Integer for Ipv6Addr { impl_integer_ops_ipv6!(); }
 
+// Could just use direct impls for char/Ipv4Addr/Ipv6Addr, but this shows how to reuse the same macro for multiple types.
+
+// Can't use default impls for Integer
+// because MIN and MAX aren't defined on IPs
+// and +1 isn't defined on IPs or char.
+
+// Can't use num_traits::PrimInt as a 'subclass'
+// because Rust worries that 'char' etc. might
+// be added to it later (coherence).
+
+
 fn main() {
     let x: u8 = 255;
     println!("u8 add_one({x}) = {}", x.add_one());
