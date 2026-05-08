@@ -1,26 +1,36 @@
 # Puzzle 9
 
-We want one playback interface so different clip types can be treated uniformly in a single sequence at runtime.
+We want a `FlashBlockable` abstraction where any concrete `T` can be saved and loaded by key, but only when that `T` also satisfies serialization and deserialization capabilities.
 
 ```mermaid
 classDiagram
     direction TB
 
-    class Playable {
+    class FlashBlockable {
         <<superclass>>
-        +play()
+        +save(flash_block, key)
+        +load(flash_block, key)
     }
 
-    class PcmClip {
+    class Serialize {
+        <<superclass>>
+        +serialize()
+    }
+
+    class Deserialize {
+        <<superclass>>
+        +deserialize()
+    }
+
+    class T {
         <<concrete subclass>>
-        +play()
+        +serialize() // inherited
+        +deserialize() // inherited
+        +save(flash_block, key) // inherited
+        +load(flash_block, key) // inherited
     }
 
-    class ToneClip {
-        <<concrete subclass>>
-        +play()
-    }
-
-    Playable <|-- PcmClip : is-a
-    Playable <|-- ToneClip : is-a
+    Serialize <|-- FlashBlockable : is-a
+    Deserialize <|-- FlashBlockable : is-a
+    FlashBlockable <|-- T : is-a
 ```
