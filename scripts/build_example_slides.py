@@ -5,10 +5,13 @@ import argparse
 import re
 import subprocess
 from pathlib import Path
+import shutil
 
 from PIL import Image, ImageDraw, ImageFont
 from pptx import Presentation
 from pptx.dml.color import RGBColor
+from pptx.enum.shapes import MSO_SHAPE
+from pptx.enum.text import MSO_ANCHOR
 from pptx.util import Inches, Pt
 from pygments import lex
 from pygments.lexers import RustLexer
@@ -30,24 +33,65 @@ def extract_markdown_parts(puzzle_md: str) -> tuple[str, str, str]:
     return title, prose, mermaid
 
 
-def render_mermaid_png(mermaid_text: str, out_png: Path, workdir: Path) -> None:
+def resolve_mmdc_command(project_root: Path, explicit_mmdc_path: str | None) -> list[str]:
+    if explicit_mmdc_path:
+        return [explicit_mmdc_path]
+
+    local_bin = project_root / "node_modules" / ".bin" / "mmdc"
+    if local_bin.exists():
+        return [str(local_bin)]
+
+    system_mmdc = shutil.which("mmdc")
+    if system_mmdc:
+        return [system_mmdc]
+
+    return ["npx", "@mermaid-js/mermaid-cli"]
+
+
+def render_mermaid_png(
+    mermaid_text: str,
+    out_png: Path,
+    workdir: Path,
+    explicit_mmdc_path: str | None,
+) -> None:
+    init_block = """%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "#0B0F14",
+    "primaryColor": "#111827",
+    "primaryTextColor": "#F9FAFB",
+    "primaryBorderColor": "#22D3EE",
+    "lineColor": "#22D3EE",
+    "tertiaryColor": "#0F172A"
+  }
+}}%%"""
+    if "%%{init:" not in mermaid_text:
+        mermaid_text = f"{init_block}\n{mermaid_text}"
+
     temp_mmd = workdir / ".tmp_mermaid.mmd"
+    temp_pptr = workdir / ".tmp_puppeteer_config.json"
     temp_mmd.write_text(mermaid_text, encoding="utf-8")
+    temp_pptr.write_text(
+        '{"args":["--no-sandbox","--disable-setuid-sandbox"]}',
+        encoding="utf-8",
+    )
     try:
-        cmd = [
-            "npx",
-            "@mermaid-js/mermaid-cli",
+        cmd = resolve_mmdc_command(workdir, explicit_mmdc_path) + [
             "-i",
             str(temp_mmd),
             "-o",
             str(out_png),
             "-b",
             "transparent",
+            "-p",
+            str(temp_pptr),
         ]
         subprocess.run(cmd, cwd=workdir, check=True)
     finally:
         if temp_mmd.exists():
             temp_mmd.unlink()
+        if temp_pptr.exists():
+            temp_pptr.unlink()
 
 
 def find_existing_mermaid_png(example_number: int, docs_dir: Path) -> Path | None:
@@ -134,26 +178,55 @@ def build_ppt(
     mermaid_png: Path,
     code_png: Path,
     code_text: str,
+    example_number: int,
     out_pptx: Path,
     code_mode: str,
 ) -> None:
     prs = Presentation()
     slide_w = prs.slide_width.inches
     slide_h = prs.slide_height.inches
+    bg_color = RGBColor(247, 247, 243)  # #F7F7F3
+    text_color = RGBColor(31, 36, 48)   # #1F2430
+    accent_color = RGBColor(91, 124, 250)  # #5B7CFA
 
-    # Slide 1: Puzzle
+    # Slide 1: Puzzle (edge-to-edge dark with right white rail)
     s1 = prs.slides.add_slide(prs.slide_layouts[6])
+    rail_w = 1.35
+    bg1 = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(slide_w), Inches(slide_h))
+    bg1.fill.solid()
+    bg1.fill.fore_color.rgb = RGBColor(0, 0, 0)
+    bg1.line.fill.background()
 
-    title_box = s1.shapes.add_textbox(Inches(0.8), Inches(0.25), Inches(slide_w - 1.6), Inches(0.75))
-    ttf = title_box.text_frame
-    ttf.clear()
-    p = ttf.paragraphs[0]
-    p.text = title
-    p.font.name = "Calibri"
-    p.font.size = Pt(40)
-    p.font.bold = True
+    rail1 = s1.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE,
+        Inches(slide_w - rail_w),
+        Inches(0),
+        Inches(rail_w),
+        Inches(slide_h),
+    )
+    rail1.fill.solid()
+    rail1.fill.fore_color.rgb = RGBColor(250, 250, 250)
+    rail1.line.color.rgb = RGBColor(220, 220, 220)
+    rail1.line.width = Pt(0.75)
 
-    prose_box = s1.shapes.add_textbox(Inches(0.8), Inches(1.0), Inches(slide_w - 1.6), Inches(1.0))
+    label1 = s1.shapes.add_textbox(
+        Inches(slide_w - rail_w + 0.1),
+        Inches(0.3),
+        Inches(rail_w - 0.2),
+        Inches(slide_h - 0.6),
+    )
+    label1.rotation = 270
+    l1tf = label1.text_frame
+    l1tf.clear()
+    l1tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    l1p = l1tf.paragraphs[0]
+    l1p.text = f"Puzzle {example_number}"
+    l1p.font.name = "Aptos"
+    l1p.font.size = Pt(28)
+    l1p.font.color.rgb = RGBColor(20, 20, 20)
+
+    content_w = slide_w - rail_w
+    prose_box = s1.shapes.add_textbox(Inches(0.8), Inches(0.55), Inches(content_w - 1.2), Inches(1.15))
     ptf = prose_box.text_frame
     ptf.clear()
     ptf.word_wrap = True
@@ -165,71 +238,80 @@ def build_ppt(
         if part.startswith("`") and part.endswith("`"):
             run.text = part[1:-1]
             run.font.name = "Consolas"
+            run.font.color.rgb = RGBColor(255, 255, 255)
         else:
             run.text = part
-            run.font.name = "Calibri"
+            run.font.name = "Aptos"
+            run.font.color.rgb = RGBColor(230, 230, 230)
         run.font.size = Pt(16)
 
     with Image.open(mermaid_png) as img:
         mw, mh = img.size
     ratio = mw / mh
-    diagram_top = 2.05
+    diagram_top = 1.85
     avail_h = slide_h - diagram_top - 0.35
-    avail_w = slide_w - 2.0
+    avail_w = content_w - 0.6
     pic_w = min(avail_w, avail_h * ratio)
     pic_h = pic_w / ratio
-    left = (slide_w - pic_w) / 2
+    left = (content_w - pic_w) / 2
+    panel = s1.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE,
+        Inches(max(0.1, left - 0.08)),
+        Inches(max(0.1, diagram_top - 0.08)),
+        Inches(pic_w + 0.16),
+        Inches(pic_h + 0.16),
+    )
+    panel.fill.solid()
+    panel.fill.fore_color.rgb = RGBColor(11, 15, 20)  # match dark mermaid background
+    panel.line.fill.background()
     s1.shapes.add_picture(str(mermaid_png), Inches(left), Inches(diagram_top), width=Inches(pic_w), height=Inches(pic_h))
 
-    # Slide 2: Rust
-    s2 = prs.slides.add_slide(prs.slide_layouts[6])
-    t2 = s2.shapes.add_textbox(Inches(0.8), Inches(0.25), Inches(slide_w - 1.6), Inches(0.75))
-    t2f = t2.text_frame
-    t2f.clear()
-    p2 = t2f.paragraphs[0]
-    p2.text = "Rust Solution"
-    p2.font.name = "Calibri"
-    p2.font.size = Pt(40)
-    p2.font.bold = True
-
-    code_top = 1.15
-    code_avail_h = slide_h - code_top - 0.35
-    code_avail_w = slide_w - 1.2
-
-    if code_mode == "image":
-        with Image.open(code_png) as img:
-            cw, ch = img.size
-        c_ratio = cw / ch
-        code_w = min(code_avail_w, code_avail_h * c_ratio)
-        code_h = code_w / c_ratio
-        code_left = (slide_w - code_w) / 2
-        s2.shapes.add_picture(
-            str(code_png),
-            Inches(code_left),
-            Inches(code_top),
-            width=Inches(code_w),
-            height=Inches(code_h),
+    # Solution slides: all-black, edge-to-edge, no title/rail, 21 lines per slide
+    code_lines = code_text.splitlines()
+    lines_per_slide = 26
+    for chunk_start in range(0, len(code_lines), lines_per_slide):
+        chunk = code_lines[chunk_start : chunk_start + lines_per_slide]
+        solution_slide = prs.slides.add_slide(prs.slide_layouts[6])
+        black_bg = solution_slide.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(slide_w), Inches(slide_h)
         )
-    else:
-        code_box = s2.shapes.add_textbox(
-            Inches(0.6),
-            Inches(code_top),
-            Inches(code_avail_w),
-            Inches(code_avail_h),
+        black_bg.fill.solid()
+        black_bg.fill.fore_color.rgb = RGBColor(0, 0, 0)
+        black_bg.line.fill.background()
+
+        if code_mode == "image":
+            # image mode not paginated by token image generation in this path; keep fallback
+            with Image.open(code_png) as img:
+                image_width, image_height = img.size
+            ratio = image_width / image_height
+            avail_w = slide_w
+            avail_h = slide_h
+            render_w = min(avail_w, avail_h * ratio)
+            render_h = render_w / ratio
+            solution_slide.shapes.add_picture(
+                str(code_png),
+                Inches((slide_w - render_w) / 2),
+                Inches((slide_h - render_h) / 2),
+                width=Inches(render_w),
+                height=Inches(render_h),
+            )
+            continue
+
+        code_box = solution_slide.shapes.add_textbox(
+            Inches(0.18),
+            Inches(0.12),
+            Inches(slide_w - 0.36),
+            Inches(slide_h - 0.24),
         )
         text_frame = code_box.text_frame
         text_frame.clear()
         text_frame.word_wrap = False
 
-        for line_index, line in enumerate(code_text.splitlines()):
-            paragraph = (
-                text_frame.paragraphs[0]
-                if line_index == 0
-                else text_frame.add_paragraph()
-            )
+        for line_index, line in enumerate(chunk):
+            paragraph = text_frame.paragraphs[0] if line_index == 0 else text_frame.add_paragraph()
             paragraph.space_after = Pt(0)
             paragraph.space_before = Pt(0)
-            paragraph.line_spacing = 1.0
+            paragraph.line_spacing = 0.95
 
             for token_type, value in lex(line, RustLexer()):
                 value = value.replace("\n", "")
@@ -238,7 +320,7 @@ def build_ppt(
                 run = paragraph.add_run()
                 run.text = value
                 run.font.name = "Consolas"
-                run.font.size = Pt(10)
+                run.font.size = Pt(16)
                 run.font.color.rgb = token_color_rgb(token_type)
 
     prs.save(out_pptx)
@@ -248,6 +330,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Build puzzle+solution slides for one example")
     parser.add_argument("--example", type=int, required=True, help="Example number, e.g. 1")
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
+    parser.add_argument(
+        "--mmdc-path",
+        default=None,
+        help="Path to Mermaid CLI binary (mmdc). If omitted, prefers ./node_modules/.bin/mmdc, then system mmdc, then npx fallback.",
+    )
     parser.add_argument(
         "--code-mode",
         choices=["image", "editable"],
@@ -290,7 +377,7 @@ def main() -> None:
         if existing != mermaid_png:
             mermaid_png.write_bytes(existing.read_bytes())
     else:
-        render_mermaid_png(mermaid, mermaid_png, root)
+        render_mermaid_png(mermaid, mermaid_png, root, args.mmdc_path)
     render_rust_code_png(solution_code, code_png)
     build_ppt(
         title,
@@ -298,6 +385,7 @@ def main() -> None:
         mermaid_png,
         code_png,
         solution_code,
+        args.example,
         out_pptx,
         args.code_mode,
     )

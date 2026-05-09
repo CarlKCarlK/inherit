@@ -1,0 +1,19 @@
+{
+  "name": "inherit",
+  "version": "1.0.0",
+  "description": "Rust has no class inheritance. Instead, it offers several smaller mechanisms that cover much of what inheritance is often used for: behavior reuse, method availability, and polymorphism.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^11.14.0"
+  }
+}
