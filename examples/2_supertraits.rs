@@ -1,14 +1,9 @@
 use std::thread;
 use std::time::Duration;
 
-// A servo is an electric motor that can move to a specified angle.
 // `Servo` is an abstract contract (a trait), not a concrete driver.
 trait Servo {
     fn set_degrees(&self, degrees: u16);
-
-    fn hold(&self) {
-        println!("holding current angle");
-    }
 }
 
 // `ServoPlayer` is also abstract. It extends `Servo` (supertrait), so any
@@ -43,21 +38,16 @@ impl ServoPlayer for ServoPlayerEsp {
             println!("[ServoPlayerEsp] hold for {ms}ms");
             thread::sleep(Duration::from_millis(*ms));
         }
-        self.hold();
     }
 }
 
 // Generic program that only needs a `Servo`.
 fn center_servo(servo: &impl Servo) {
     servo.set_degrees(90);
-    servo.hold();
 }
 
 // Generic program that needs a `ServoPlayer`.
-// Because `ServoPlayer: Servo`, this program can call all `Servo` methods plus
-// one extra method (`animate`).
 fn run_wave(player: &impl ServoPlayer) {
-    player.hold();
     player.animate(&[
         (0, 120),
         (45, 100),
@@ -73,9 +63,11 @@ fn run_wave(player: &impl ServoPlayer) {
 
 fn main() {
     let servo = ServoEsp;
-    let player = ServoPlayerEsp;
+    let servo_player = ServoPlayerEsp;
 
     center_servo(&servo);
-    center_servo(&player); // `ServoPlayer` can do everything `Servo` can!
-    run_wave(&player);
+    // `ServoPlayer` can do everything `Servo` can!
+    center_servo(&servo_player);
+    // and more.
+    run_wave(&servo_player);
 }

@@ -254,16 +254,6 @@ def build_ppt(
     pic_w = min(avail_w, avail_h * ratio)
     pic_h = pic_w / ratio
     left = (content_w - pic_w) / 2
-    panel = s1.shapes.add_shape(
-        MSO_SHAPE.RECTANGLE,
-        Inches(max(0.1, left - 0.08)),
-        Inches(max(0.1, diagram_top - 0.08)),
-        Inches(pic_w + 0.16),
-        Inches(pic_h + 0.16),
-    )
-    panel.fill.solid()
-    panel.fill.fore_color.rgb = RGBColor(11, 15, 20)  # match dark mermaid background
-    panel.line.fill.background()
     s1.shapes.add_picture(str(mermaid_png), Inches(left), Inches(diagram_top), width=Inches(pic_w), height=Inches(pic_h))
 
     # Solution slides: all-black, edge-to-edge, no title/rail, 21 lines per slide
