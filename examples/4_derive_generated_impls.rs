@@ -24,12 +24,13 @@ fn main() {
     let on = LedLevel::On;
     let off = LedLevel::Off;
 
-    println!("default: {:?}", default_level);
-    println!("on == off: {}", on == off);
-    println!("on > off: {}", on > off);
+    assert_eq!(default_level, LedLevel::Off);
+    assert_ne!(on, off);
+    assert!(off > on);
 
     // `Copy` + `Clone` come from derive too.
     let copied = on;
     let cloned = off.clone();
-    println!("copied: {:?}, cloned: {:?}", copied, cloned);
+    assert_eq!(copied, on);
+    assert_eq!(cloned, off);
 }

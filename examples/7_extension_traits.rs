@@ -22,6 +22,6 @@ fn main() {
     let count: usize = 7;
     let size: usize = 12;
 
-    println!("count is odd: {}", count.is_odd());
-    println!("size is odd: {}", size.is_odd());
+    assert!(count.is_odd());
+    assert!(!size.is_odd());
 }

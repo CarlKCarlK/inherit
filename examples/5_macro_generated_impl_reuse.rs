@@ -104,13 +104,11 @@ impl Integer for Ipv6Addr { impl_integer_ops_ipv6!(); }
 
 
 fn main() {
-    let x: u8 = 255;
-    println!("u8 add_one({x}) = {}", x.add_one());
+    let x: u8 = 254;
+    assert_eq!(x.add_one(), 255);
 
-    println!("char min={:?} max={:?}", char::min_value(), char::max_value());
-    println!(
-        "ipv4 min={:?} max={:?}",
-        Ipv4Addr::min_value(),
-        Ipv4Addr::max_value()
-    );
+    assert_eq!(char::min_value(), char::MIN);
+    assert_eq!(char::max_value(), char::MAX);
+    assert_eq!(Ipv4Addr::min_value(), Ipv4Addr::from(0u32));
+    assert_eq!(Ipv4Addr::max_value(), Ipv4Addr::from(u32::MAX));
 }

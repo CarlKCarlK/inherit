@@ -46,6 +46,6 @@ fn main() {
     let mut eight = OutputArray::<8>::new();
     eight.set_from_bits(0b1011_0001);
 
-    println!("N=4 levels: {:?}", any.levels);
-    println!("N=8 levels: {:?}", eight.levels);
+    assert_eq!(any.levels, [false, false, true, false]);
+    assert_eq!(eight.levels, [true, false, false, false, true, true, false, true]);
 }

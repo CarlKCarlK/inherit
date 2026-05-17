@@ -62,11 +62,8 @@ fn main() {
         ssid: "HomeWiFi".to_string(),
         password: "secret".to_string(),
     };
-    println!(
-        "ssid={} password_len={}",
-        credentials.ssid,
-        credentials.password.len()
-    );
+    assert_eq!(credentials.ssid, "HomeWiFi");
+    assert_eq!(credentials.password.len(), 6);
 
     // Works: WifiCredentials satisfies Serialize + Deserialize.
     flash.save("wifi", &credentials);
@@ -76,9 +73,9 @@ fn main() {
     // let label = DisplayOnly("status".to_string());
     // flash.save("label", &label); // error: DisplayOnly doesn't satisfy bounds
     let label = DisplayOnly("status".to_string());
-    println!("display-only sample: {}", label.0);
+    assert_eq!(label.0, "status");
 
-    println!("stored keys: {}", flash.store.len());
+    assert_eq!(flash.store.len(), 1);
     flash.clear();
-    println!("stored keys after clear: {}", flash.store.len());
+    assert_eq!(flash.store.len(), 0);
 }

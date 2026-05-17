@@ -71,13 +71,13 @@ impl Borrow<str> for HtmlBuffer {
     }
 }
 
-fn print_len(s: impl AsRef<str>) {
-    println!("as_ref len={}", s.as_ref().len());
+fn text_len(s: impl AsRef<str>) -> usize {
+    s.as_ref().len()
 }
 
-fn print_headline(s: impl Borrow<str>) {
+fn borrowed_text(s: impl Borrow<str>) -> String {
     let text: &str = s.borrow();
-    println!("borrow text={}", text);
+    text.to_string()
 }
 
 fn main() {
@@ -87,11 +87,10 @@ fn main() {
     page.push_str("<h1>Hello</h1>");
     page.push_str("<p>Rust</p>");
 
-    println!("html length: {}", page.len());
-    println!("bytes length: {}", page.as_bytes().len());
-    println!("html: {}", &*page);
+    assert_eq!(page.len(), page.as_bytes().len());
+    assert_eq!(&*page, "<h1>Hello</h1><p>Rust</p>");
 
     let html2: HtmlBuffer = "<h2>World</h2>".to_string().into(); // From<String>
-    print_len(&html2); // AsRef<str>
-    print_headline(html2); // Borrow<str>
+    assert_eq!(text_len(&html2), "<h2>World</h2>".len()); // AsRef<str>
+    assert_eq!(borrowed_text(html2), "<h2>World</h2>"); // Borrow<str>
 }
