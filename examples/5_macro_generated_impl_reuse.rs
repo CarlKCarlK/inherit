@@ -1,7 +1,5 @@
 use std::net::{Ipv4Addr, Ipv6Addr};
 
-// Closer to range-set-blaze style: explicit impl blocks + macro reuse.
-// Simplified surface: only add_one/min_value/max_value.
 trait Integer: Copy + Ord {
     fn add_one(self) -> Self;
     fn min_value() -> Self;
@@ -24,34 +22,18 @@ macro_rules! impl_integer_ops_num {
     };
 }
 
-macro_rules! impl_integer_ops_ipv4 {
-    () => {
+macro_rules! impl_integer_ops_ip {
+    ($ip_type:ty, $representation_type:ty) => {
         fn add_one(self) -> Self {
-            Ipv4Addr::from(u32::from(self).wrapping_add(1))
+            <$ip_type>::from(<$representation_type>::from(self).wrapping_add(1))
         }
 
         fn min_value() -> Self {
-            Ipv4Addr::from(0u32)
+            <$ip_type>::from(<$representation_type>::MIN)
         }
 
         fn max_value() -> Self {
-            Ipv4Addr::from(u32::MAX)
-        }
-    };
-}
-
-macro_rules! impl_integer_ops_ipv6 {
-    () => {
-        fn add_one(self) -> Self {
-            Ipv6Addr::from(u128::from(self).wrapping_add(1))
-        }
-
-        fn min_value() -> Self {
-            Ipv6Addr::from(0u128)
-        }
-
-        fn max_value() -> Self {
-            Ipv6Addr::from(u128::MAX)
+            <$ip_type>::from(<$representation_type>::MAX)
         }
     };
 }
@@ -88,24 +70,20 @@ impl Integer for i128 { impl_integer_ops_num!(i128); }
 impl Integer for u128 { impl_integer_ops_num!(u128); }
 impl Integer for isize { impl_integer_ops_num!(isize); }
 impl Integer for usize { impl_integer_ops_num!(usize); }
+impl Integer for Ipv4Addr { impl_integer_ops_ip!(Ipv4Addr, u32); }
+impl Integer for Ipv6Addr { impl_integer_ops_ip!(Ipv6Addr, u128); }
 impl Integer for char { impl_integer_ops_char!(); }
-impl Integer for Ipv4Addr { impl_integer_ops_ipv4!(); }
-impl Integer for Ipv6Addr { impl_integer_ops_ipv6!(); }
-
-// Could just use direct impls for char/Ipv4Addr/Ipv6Addr, but this shows how to reuse the same macro for multiple types.
-
-// Can't use default impls for Integer
-// because MIN and MAX aren't defined on IPs
-// and +1 isn't defined on IPs or char.
 
 // Can't use num_traits::PrimInt as a 'subclass'
 // because Rust worries that 'char' etc. might
 // be added to it later (coherence).
 
+// TECHNIQUE NAME: macro-generated implementation.
 
 fn main() {
     let x: u8 = 254;
     assert_eq!(x.add_one(), 255);
+    assert_eq!('a'.add_one(), 'b');
 
     assert_eq!(char::min_value(), char::MIN);
     assert_eq!(char::max_value(), char::MAX);

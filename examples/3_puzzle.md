@@ -2,7 +2,6 @@
 
 We want to union any number of sets (`RangeSetBlaze<T>`). In OO terms, any collection that is an iterable of `RangeSetBlaze<T>` references should inherit this operation.
 
-
 ```mermaid
 classDiagram
     direction TB

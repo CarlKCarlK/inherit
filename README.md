@@ -56,6 +56,8 @@ Generate puzzle+solution slides for one example:
 
 - `just generate 3`
 
+This command first runs the matching example (`cargo run --example ...`) and then generates slides.
+
 This writes:
 
 - `docs/example3_walkthrough.pptx`

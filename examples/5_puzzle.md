@@ -1,6 +1,9 @@
 # Puzzle 5
 
-We want to treat 15 integer-like types from `u8` to `usize` to `i128` and `char` and `IPv4`, `IPv6` uniformly. For example, with a min, max, and ability to add one (unchecked).
+Treat 15 integer-like types uniformly:
+ `u8`, ...,  `usize`, ...`i128`, `char`, `IPv4`, `IPv6`
+ 
+For example, with a `min`, `max`, and ability to add one (unchecked).
 
 ```mermaid
 classDiagram
@@ -13,36 +16,61 @@ classDiagram
         +max_value()
     }
 
-    class u8 {
-        <<subclass group>>
+    class NumericInteger {
+        <<superclass>>
         +add_one()
         +min_value()
         +max_value()
     }
 
-    class CharType {
-        <<subclass>>
+    class IpInteger {
+        <<superclass>>
         +add_one()
         +min_value()
         +max_value()
+    }
+
+    class CharInteger {
+        <<superclass>>
+        +add_one()
+        +min_value()
+        +max_value()
+    }
+
+    class u8 {
+        <<subclass>>
+        +add_one() // inherited
+        +min_value() // inherited
+        +max_value() // inherited
     }
 
     class IPv4Type {
         <<subclass>>
-        +add_one()
-        +min_value()
-        +max_value()
+        +add_one() // inherited
+        +min_value() // inherited
+        +max_value() // inherited
     }
 
     class IPv6Type {
         <<subclass>>
-        +add_one()
-        +min_value()
-        +max_value()
+        +add_one() // inherited
+        +min_value() // inherited
+        +max_value() // inherited
     }
 
-    Integer <|-- u8 : is-a
-    Integer <|-- CharType : is-a
-    Integer <|-- IPv4Type : is-a
-    Integer <|-- IPv6Type : is-a
+    class CharType {
+        <<subclass>>
+        +add_one() // inherited
+        +min_value() // inherited
+        +max_value() // inherited
+    }
+
+    Integer <|-- NumericInteger : is-a
+    Integer <|-- IpInteger : is-a
+    Integer <|-- CharInteger : is-a
+
+    NumericInteger <|-- u8 : is-a
+    IpInteger <|-- IPv4Type : is-a
+    IpInteger <|-- IPv6Type : is-a
+    CharInteger <|-- CharType : is-a
 ```
