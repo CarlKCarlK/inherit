@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw, ImageFont
 from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
-from pptx.enum.text import MSO_ANCHOR
+from pptx.enum.text import MSO_ANCHOR, MSO_AUTO_SIZE
 from pptx.util import Inches, Pt
 from pygments import lex
 from pygments.lexers import RustLexer
@@ -191,7 +191,7 @@ def build_ppt(
 
     # Slide 1: Puzzle (edge-to-edge dark with right white rail)
     s1 = prs.slides.add_slide(prs.slide_layouts[6])
-    rail_w = 1.35
+    rail_w = 1.75
     bg1 = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0), Inches(0), Inches(slide_w), Inches(slide_h))
     bg1.fill.solid()
     bg1.fill.fore_color.rgb = RGBColor(0, 0, 0)
@@ -210,19 +210,20 @@ def build_ppt(
     rail1.line.width = Pt(0.75)
 
     label1 = s1.shapes.add_textbox(
-        Inches(slide_w - rail_w + 0.1),
+        Inches(slide_w - rail_w + 0.08),
         Inches(0.3),
-        Inches(rail_w - 0.2),
+        Inches(rail_w - 0.16),
         Inches(slide_h - 0.6),
     )
     label1.rotation = 270
     l1tf = label1.text_frame
     l1tf.clear()
+    l1tf.word_wrap = True
     l1tf.vertical_anchor = MSO_ANCHOR.MIDDLE
     l1p = l1tf.paragraphs[0]
     l1p.text = f"Puzzle {example_number}"
     l1p.font.name = "Aptos"
-    l1p.font.size = Pt(28)
+    l1p.font.size = Pt(26)
     l1p.font.color.rgb = RGBColor(20, 20, 20)
 
     content_w = slide_w - rail_w
@@ -295,7 +296,8 @@ def build_ppt(
         )
         text_frame = code_box.text_frame
         text_frame.clear()
-        text_frame.word_wrap = False
+        text_frame.word_wrap = True
+        text_frame.auto_size = MSO_AUTO_SIZE.NONE
 
         for line_index, line in enumerate(chunk):
             paragraph = text_frame.paragraphs[0] if line_index == 0 else text_frame.add_paragraph()

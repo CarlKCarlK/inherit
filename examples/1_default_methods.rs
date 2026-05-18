@@ -1,6 +1,7 @@
 use std::ops::RangeInclusive;
 
 // Mini `range-set-blaze` Integer
+// TECHNIQUE NAME: Trait Default Methods.
 trait Integer: Copy + Ord {
     fn min_value() -> Self;
     fn max_value() -> Self;

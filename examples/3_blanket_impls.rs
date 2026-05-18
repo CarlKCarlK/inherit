@@ -1,43 +1,49 @@
 use std::collections::BTreeSet;
 
+// For this example, use u64 as our stand-in integer type.
+type Integer = u64;
+
 // Mock up RangeSetBlaze as a BTreeSet wrapper for demo purposes.
-#[derive(Debug, Clone)]
-struct RangeSetBlaze<T> {
-    values: BTreeSet<T>,
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct RangeSetBlaze {
+    values: BTreeSet<Integer>,
 }
 
-impl<T: Ord + Copy> RangeSetBlaze<T> {
+impl RangeSetBlaze {
     fn new() -> Self {
         Self {
             values: BTreeSet::new(),
         }
     }
 
-    fn from_slice(values: &[T]) -> Self {
+    // Construct from a slice of Integer values.
+    fn from_slice(values: &[Integer]) -> Self {
         Self {
             values: values.iter().copied().collect(),
         }
     }
 
+    // Return a new set that is the union of two borrowed sets.
     fn union(&self, other: &Self) -> Self {
-        let mut out = self.values.clone();
-        out.extend(other.values.iter().copied());
-        Self { values: out }
+        Self {
+            values: self.values.union(&other.values).copied().collect(),
+        }
+    }
+
+    fn is_empty(&self) -> bool {
+        self.values.is_empty()
     }
 }
 
-// Borrowed blanket-impl variant: any iterator of &RangeSetBlaze<T>
-// automatically gains `union` without consuming sets.
+// A RangeSetCollection is any type that can be turned into an iterator
+// over borrowed RangeSetBlaze values.
 //
-// Faux-inheritance / "is-a" angle:
-// If a type `I` satisfies `IntoIterator<Item = &RangeSetBlaze<T>>`,
-// then `I` automatically "is a" `RangeSetRefIterable` and gets
-// the `union` method with no per-type impl.
-trait RangeSetRefIterable<T>: Sized {
-    fn union<'a>(self) -> RangeSetBlaze<T>
+// TECHNIQUE NAME: "blanket implementation".
+// One impl applies to every type that matches the bound.
+trait RangeSetCollection<'a>: IntoIterator<Item = &'a RangeSetBlaze> {
+    fn union(self) -> RangeSetBlaze
     where
-        T: Ord + Copy + 'a,
-        Self: IntoIterator<Item = &'a RangeSetBlaze<T>>,
+        Self: Sized,
     {
         let mut result = RangeSetBlaze::new();
         for set in self {
@@ -47,9 +53,10 @@ trait RangeSetRefIterable<T>: Sized {
     }
 }
 
-// Any type can opt into this extension trait; the method itself is gated by
-// the IntoIterator<Item = &RangeSetBlaze<T>> requirement above.
-impl<T, I> RangeSetRefIterable<T> for I {}
+// Blanket implementation:
+// Any type that can be turned into an iterator over &RangeSetBlaze
+// automatically implements RangeSetCollection.
+impl<'a, I> RangeSetCollection<'a> for I where I: IntoIterator<Item = &'a RangeSetBlaze> {}
 
 fn main() {
     let a = RangeSetBlaze::from_slice(&[1, 2, 3]);
@@ -57,6 +64,10 @@ fn main() {
     let c = RangeSetBlaze::from_slice(&[5, 7, 9]);
 
     let expected = RangeSetBlaze::from_slice(&[1, 2, 3, 4, 5, 7, 9]);
-    assert_eq!(vec![&a, &b, &c].union().values, expected.values);
-    assert_eq!([&a, &b, &c].union().values, expected.values);
+    // A vector of sets can be unioned together.
+    assert_eq!(vec![&a, &b, &c].union(), expected);
+    // An array of sets can be unioned together.
+    assert_eq!([&a, &b, &c].union(), expected);
+    // A filtered option can be unioned.
+    assert_eq!(Some(&a).filter(|set| !set.is_empty()).union(), a);
 }

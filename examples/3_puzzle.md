@@ -1,6 +1,6 @@
 # Puzzle 3
 
-We want to union any number of sets(`RangeSetBlaze<T>`). In OO terms, any collection that is an iterable of `RangeSetBlaze<T>` references should inherit this operation.
+We want to union any number of sets (`RangeSetBlaze<T>`). In OO terms, any collection that is an iterable of `RangeSetBlaze<T>` references should inherit this operation.
 
 
 ```mermaid
@@ -12,29 +12,32 @@ classDiagram
         +iterator()
     }
 
-    class IterableOfRangeSetRefs {
+    class RangeSetCollection {
         <<superclass>>
-        +iterator()
-        +union() RangeSetBlaze // inherit
+        +iterator() // from Iterable
+        +union()
     }
 
     class VectorOfRangeSetRefs {
         <<subclass>>
         +iterator()
+        +union() // inherited
     }
 
     class ArrayOfRangeSetRefs {
         <<subclass>>
         +iterator()
+        +union() // inherited
     }
 
-    class anyOtherIterableOfRangeSetRefs {
+    class AnyOtherRangeSetCollection {
         <<subclass>>
         +iterator()
+        +union() // inherited
     }
 
-    Iterable <|-- IterableOfRangeSetRefs : is-a
-    IterableOfRangeSetRefs <|-- VectorOfRangeSetRefs : is-a
-    IterableOfRangeSetRefs <|-- ArrayOfRangeSetRefs : is-a
-    IterableOfRangeSetRefs <|-- anyOtherIterableOfRangeSetRefs : is-a
+    Iterable <|-- RangeSetCollection : is-a
+    RangeSetCollection <|-- VectorOfRangeSetRefs : is-a
+    RangeSetCollection <|-- ArrayOfRangeSetRefs : is-a
+    RangeSetCollection <|-- AnyOtherRangeSetCollection : is-a
 ```

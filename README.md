@@ -49,3 +49,17 @@ Rust has no class inheritance. Instead, it offers several smaller mechanisms tha
 ## Suggested Learning Order
 
 Run them in the order listed.
+
+## Slide Generation
+
+Generate puzzle+solution slides for one example:
+
+- `just generate 3`
+
+This writes:
+
+- `docs/example3_walkthrough.pptx`
+
+Equivalent direct command:
+
+- `python3 scripts/build_example_slides.py --example 3 --project-root .`

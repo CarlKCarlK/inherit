@@ -8,6 +8,8 @@ trait Servo {
 
 // `ServoPlayer` is also abstract. It extends `Servo` (supertrait), so any
 // `ServoPlayer` can do everything in `Servo` plus animation.
+// TECHNIQUE NAME: Supertrait Default Methods.
+// (This example shows supertrait-based interface extension.)
 trait ServoPlayer: Servo {
     // (degrees, milliseconds to hold at that angle)
     fn animate(&self, steps: &[(u16, u64)]);
