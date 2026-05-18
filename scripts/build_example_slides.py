@@ -107,20 +107,28 @@ def find_existing_mermaid_png(example_number: int, docs_dir: Path) -> Path | Non
 
 
 def token_color(token_type) -> tuple[int, int, int]:
-    # VS Code dark-ish palette
+    # Professional dark-theme palette with explicit decorator styling.
+    if token_type in Token.Name.Decorator:
+        return (106, 153, 85)  # attributes like #[derive(...)]
     if token_type in Token.Keyword or token_type in Token.Operator.Word:
-        return (197, 134, 192)
-    if token_type in Token.Name.Builtin or token_type in Token.Name.Class or token_type in Token.Name.Namespace or token_type in Token.Name.Type:
-        return (78, 201, 176)
+        return (199, 146, 234)
+    if token_type in Token.Name.Function or token_type in Token.Name.Function.Magic:
+        return (130, 170, 255)
+    if token_type in Token.Name.Type or token_type in Token.Name.Class:
+        return (255, 203, 107)
+    if token_type in Token.Name.Builtin or token_type in Token.Name.Namespace:
+        return (137, 221, 255)
     if token_type in Token.Literal.String:
-        return (206, 145, 120)
+        return (195, 232, 141)
     if token_type in Token.Literal.Number:
-        return (181, 206, 168)
+        return (247, 140, 108)
     if token_type in Token.Comment:
         return (106, 153, 85)
-    if token_type in Token.Name.Function:
-        return (220, 220, 170)
-    return (220, 220, 220)
+    if token_type in Token.Operator:
+        return (137, 221, 255)
+    if token_type in Token.Punctuation:
+        return (186, 194, 222)
+    return (238, 255, 255)
 
 
 def token_color_rgb(token_type) -> RGBColor:

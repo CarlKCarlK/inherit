@@ -1,3 +1,5 @@
+// TECHNIQUE NAME: derive-generated implementation
+
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd, Default)]
 enum LedLevel {
     On,
