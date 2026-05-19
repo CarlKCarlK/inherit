@@ -189,8 +189,13 @@ def build_ppt(
     example_number: int,
     out_pptx: Path,
     code_mode: str,
+    slide_size_inches: tuple[float, float] | None,
 ) -> None:
     prs = Presentation()
+    if slide_size_inches is not None:
+        slide_width_inches, slide_height_inches = slide_size_inches
+        prs.slide_width = Inches(slide_width_inches)
+        prs.slide_height = Inches(slide_height_inches)
     slide_w = prs.slide_width.inches
     slide_h = prs.slide_height.inches
     bg_color = RGBColor(247, 247, 243)  # #F7F7F3
@@ -353,6 +358,17 @@ def main() -> None:
     docs = root / "docs"
     docs.mkdir(exist_ok=True)
 
+    # Match intro deck size when present; otherwise use 16:9 HD landscape.
+    intro_pptx = docs / "intro.pptx"
+    if intro_pptx.exists():
+        intro_deck = Presentation(str(intro_pptx))
+        slide_size_inches = (
+            intro_deck.slide_width.inches,
+            intro_deck.slide_height.inches,
+        )
+    else:
+        slide_size_inches = (13.333, 7.5)
+
     puzzle_md_path = examples / f"{args.example}_puzzle.md"
     solution_rs_candidates = sorted(examples.glob(f"{args.example}_*.rs"))
     if not solution_rs_candidates:
@@ -388,6 +404,7 @@ def main() -> None:
         args.example,
         out_pptx,
         args.code_mode,
+        slide_size_inches,
     )
 
     print(out_pptx)

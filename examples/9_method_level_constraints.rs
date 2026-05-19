@@ -66,14 +66,3 @@ fn main() -> Result<(), postcard::Error> {
 
     Ok(())
 }
-
-// TECHNIQUE NAMES (Examples 1-9):
-// 1. Trait Default Methods      -- interface defines default implementation
-// 2. Supertrait Default Methods -- #1 but with more levels
-// 3. Extension Traits           -- add methods to one or few foreign types
-// 4. Derive-Generated Implementations -- #[derive(Clone, Debug, etc.)]
-// 5. Deref Method Lookup        -- add methods to concrete types
-// 6. Blanket Implementation     -- add methods to all (foreign) types that satisfy
-// 7. Macro-Generated Implementation Reuse -- when #2 doesn't work
-// 8. Constraint-Gated Methods   -- e.g. when N=8, add a method
-// 9. Method-Level Constraints   -- e.g. method defined when T: Serialize + Deserialize

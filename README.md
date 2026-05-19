@@ -60,7 +60,8 @@ This command first runs the matching example (`cargo run --example ...`) and the
 
 This writes:
 
-- `docs/example3_walkthrough.pptx`
+- `docs/example3_walkthrough.pptx` (for `just generate 3`)
+- `docs/rust-inheritance.pptx` (for `just generate-talk`)
 
 Equivalent direct command:
 

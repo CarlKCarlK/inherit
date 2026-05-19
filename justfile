@@ -16,7 +16,7 @@ generate-talk:
     done
     @test -f docs/intro.pptx || { echo "Missing docs/intro.pptx" >&2; exit 1; }
     @test -f docs/outro.pptx || { echo "Missing docs/outro.pptx" >&2; exit 1; }
-    uv run python scripts/assemble_talk.py --output docs/talk.pptx \
+    uv run python scripts/assemble_talk.py --output docs/rust-inheritance.pptx \
       docs/intro.pptx \
       docs/example1_walkthrough.pptx \
       docs/example2_walkthrough.pptx \
