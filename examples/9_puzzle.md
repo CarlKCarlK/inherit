@@ -1,16 +1,10 @@
 # Puzzle 9
 
-We want a `FlashBlockable` abstraction where any concrete `T` can be saved and loaded by key, but only when that `T` also satisfies serialization and deserialization capabilities.
+We want two levels of `FlashBlock`: a base level with `new` and `clear`, and a constrained level that adds `save` and `load` only when `T` satisfies both serialization and deserialization capabilities.
 
 ```mermaid
 classDiagram
     direction TB
-
-    class FlashBlockable {
-        <<superclass>>
-        +save(flash_block, key)
-        +load(flash_block, key)
-    }
 
     class Serialize {
         <<superclass>>
@@ -22,15 +16,27 @@ classDiagram
         +deserialize()
     }
 
-    class T {
+    class TConstrained["T: Serialize + Deserialize"] {
         <<concrete subclass>>
         +serialize() // inherited
         +deserialize() // inherited
-        +save(flash_block, key) // inherited
-        +load(flash_block, key) // inherited
     }
 
-    Serialize <|-- FlashBlockable : is-a
-    Deserialize <|-- FlashBlockable : is-a
-    FlashBlockable <|-- T : is-a
+    class FlashBlock {
+        <<superclass>>
+        +new()
+        +clear()
+    }
+
+    class FlashBlockForTSerializeDeserialize {
+        <<subclass>>
+        +new() // inherited
+        +clear() // inherited
+        +save(value, key)
+        +load(key) T
+    }
+
+    Serialize <|-- TConstrained : is-a
+    Deserialize <|-- TConstrained : is-a
+    FlashBlock <|-- FlashBlockForTSerializeDeserialize : is-a
 ```

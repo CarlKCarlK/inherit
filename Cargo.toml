@@ -5,3 +5,7 @@ edition = "2024"
 
 [dependencies]
 num-traits = "0.2"
+
+[dev-dependencies]
+postcard = { version = "1", features = ["use-std"] }
+serde = { version = "1", features = ["derive"] }

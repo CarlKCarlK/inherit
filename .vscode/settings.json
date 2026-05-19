@@ -3,6 +3,7 @@
         "Blockable",
         "impls",
         "mmdc",
-        "pptr"
+        "pptr",
+        "stdvec"
     ]
 }

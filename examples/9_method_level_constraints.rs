@@ -1,31 +1,23 @@
 use std::collections::HashMap;
 
-/// Simple stand-in traits so this example has no external dependencies.
-trait Serialize {}
-trait Deserialize {}
+use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 struct WifiCredentials {
     ssid: String,
     password: String,
 }
-impl Serialize for WifiCredentials {}
-impl Deserialize for WifiCredentials {}
 
-#[derive(Debug, Clone)]
-struct DisplayOnly(String); // Intentionally not serializable.
-
-/// Tiny in-memory "flash block" demo.
-///
 /// Key point: method-level gating.
 /// - The type exists for all use-cases.
 /// - Only `save/load<T>` require extra capabilities on `T`.
 #[derive(Default)]
-struct FlashBlockDemo {
+struct FlashBlock {
     store: HashMap<String, Vec<u8>>,
 }
 
-impl FlashBlockDemo {
+impl FlashBlock {
     fn new() -> Self {
         Self::default()
     }
@@ -34,48 +26,54 @@ impl FlashBlockDemo {
         self.store.clear();
     }
 
-    fn save<T>(&mut self, key: &str, _value: &T)
+    fn save<T>(&mut self, key: &str, value: &T) -> Result<(), postcard::Error>
     where
-        T: Serialize + Deserialize,
+        T: Serialize + DeserializeOwned,
     {
-        // Real code would serialize `value` here.
-        self.store.insert(key.to_string(), vec![1, 2, 3]);
+        let bytes = postcard::to_stdvec(value)?;
+        self.store.insert(key.to_string(), bytes);
+        Ok(())
     }
 
     fn load<T>(&self, key: &str) -> Option<T>
     where
-        T: Serialize + Deserialize,
+        T: Serialize + DeserializeOwned,
     {
-        // Real code would deserialize bytes into `T` here.
-        if self.store.contains_key(key) {
-            None
-        } else {
-            None
-        }
+        let bytes = self.store.get(key)?;
+        postcard::from_bytes(bytes).ok()
     }
 }
 
-fn main() {
-    let mut flash = FlashBlockDemo::new();
+// TECHNIQUE NAME: method-level gating.
+
+fn main() -> Result<(), postcard::Error> {
+    let mut flash = FlashBlock::new();
 
     let credentials = WifiCredentials {
         ssid: "HomeWiFi".to_string(),
         password: "secret".to_string(),
     };
-    assert_eq!(credentials.ssid, "HomeWiFi");
-    assert_eq!(credentials.password.len(), 6);
 
     // Works: WifiCredentials satisfies Serialize + Deserialize.
-    flash.save("wifi", &credentials);
-    let _loaded: Option<WifiCredentials> = flash.load("wifi");
+    flash.save("wifi", &credentials)?;
+    let loaded: Option<WifiCredentials> = flash.load("wifi");
+    let loaded = loaded.unwrap();
+    assert_eq!(&loaded.ssid, "HomeWiFi");
+    assert_eq!(&loaded.password, "secret");
 
-    // Uncomment to see method-level gating fail:
-    // let label = DisplayOnly("status".to_string());
-    // flash.save("label", &label); // error: DisplayOnly doesn't satisfy bounds
-    let label = DisplayOnly("status".to_string());
-    assert_eq!(label.0, "status");
-
-    assert_eq!(flash.store.len(), 1);
     flash.clear();
-    assert_eq!(flash.store.len(), 0);
+    assert!(flash.load::<WifiCredentials>("wifi").is_none());
+
+    Ok(())
 }
+
+// TECHNIQUE NAMES (Examples 1-9):
+// 1. Trait Default Methods      -- interface defines default implementation
+// 2. Supertrait Default Methods -- #1 but with more levels
+// 3. Blanket Implementation     -- e.g. add method to all IntoIterators
+// 4. Derive-Generated Implementations -- #[derive(Clone, Debug, etc.)]
+// 5. Macro-Generated Implementation Reuse -- when #2 doesn't work
+// 6. Deref Method Lookup        -- add methods to concrete types
+// 7. Extension Traits           -- same as #3
+// 8. Constraint-Gated Methods   -- e.g. when N=8, add a method
+// 9. Method-Level Constraints   -- e.g. method defined when T: Serialize + Deserialize
