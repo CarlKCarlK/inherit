@@ -351,15 +351,21 @@ def main() -> None:
         action="store_true",
         help="Skip Mermaid rendering and reuse an existing diagram image from docs/",
     )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="Directory for generated slide artifacts (default: target/slides)",
+    )
     args = parser.parse_args()
 
     root = args.project_root.resolve()
     examples = root / "examples"
-    docs = root / "docs"
-    docs.mkdir(exist_ok=True)
+    output_dir = (args.output_dir or (root / "target" / "slides")).resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Match intro deck size when present; otherwise use 16:9 HD landscape.
-    intro_pptx = docs / "intro.pptx"
+    intro_pptx = root / "docs" / "intro.pptx"
     if intro_pptx.exists():
         intro_deck = Presentation(str(intro_pptx))
         slide_size_inches = (
@@ -380,15 +386,15 @@ def main() -> None:
 
     title, prose, mermaid = extract_markdown_parts(puzzle_md)
 
-    mermaid_png = docs / f"{args.example}_puzzle_diagram.png"
-    code_png = docs / f"{args.example}_solution_code.png"
-    out_pptx = docs / f"example{args.example}_walkthrough.pptx"
+    mermaid_png = output_dir / f"{args.example}_puzzle_diagram.png"
+    code_png = output_dir / f"{args.example}_solution_code.png"
+    out_pptx = output_dir / f"example{args.example}_walkthrough.pptx"
 
     if args.offline:
-        existing = find_existing_mermaid_png(args.example, docs)
+        existing = find_existing_mermaid_png(args.example, output_dir)
         if not existing:
             raise RuntimeError(
-                "Offline mode requested, but no existing diagram image found in docs/"
+                "Offline mode requested, but no existing diagram image found in output dir."
             )
         if existing != mermaid_png:
             mermaid_png.write_bytes(existing.read_bytes())

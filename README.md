@@ -1,5 +1,7 @@
 # Rust "Inheritance" Example Roadmap
 
+todo00 replace all this
+
 Rust has no class inheritance. Instead, it offers several smaller mechanisms that cover much of what inheritance is often used for: behavior reuse, method availability, and polymorphism.
 
 ## Behavior Reuse
@@ -60,8 +62,8 @@ This command first runs the matching example (`cargo run --example ...`) and the
 
 This writes:
 
-- `docs/example3_walkthrough.pptx` (for `just generate 3`)
-- `docs/rust-inheritance.pptx` (for `just generate-talk`)
+- `target/slides/example3_walkthrough.pptx` (for `just generate 3`)
+- `target/slides/rust-inheritance.pptx` (for `just generate-talk`)
 
 Equivalent direct command:
 

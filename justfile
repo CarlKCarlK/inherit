@@ -16,15 +16,15 @@ generate-talk:
     done
     @test -f docs/intro.pptx || { echo "Missing docs/intro.pptx" >&2; exit 1; }
     @test -f docs/outro.pptx || { echo "Missing docs/outro.pptx" >&2; exit 1; }
-    uv run python scripts/assemble_talk.py --output docs/rust-inheritance.pptx \
+    uv run python scripts/assemble_talk.py --output target/slides/rust-inheritance.pptx \
       docs/intro.pptx \
-      docs/example1_walkthrough.pptx \
-      docs/example2_walkthrough.pptx \
-      docs/example3_walkthrough.pptx \
-      docs/example4_walkthrough.pptx \
-      docs/example5_walkthrough.pptx \
-      docs/example6_walkthrough.pptx \
-      docs/example7_walkthrough.pptx \
-      docs/example8_walkthrough.pptx \
-      docs/example9_walkthrough.pptx \
+      target/slides/example1_walkthrough.pptx \
+      target/slides/example2_walkthrough.pptx \
+      target/slides/example3_walkthrough.pptx \
+      target/slides/example4_walkthrough.pptx \
+      target/slides/example5_walkthrough.pptx \
+      target/slides/example6_walkthrough.pptx \
+      target/slides/example7_walkthrough.pptx \
+      target/slides/example8_walkthrough.pptx \
+      target/slides/example9_walkthrough.pptx \
       docs/outro.pptx

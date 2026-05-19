@@ -1,6 +1,5 @@
 use std::ops::RangeInclusive;
 
-// Mini `range-set-blaze` Integer
 // TECHNIQUE NAME: Trait Default Methods.
 trait Integer: Copy + Ord {
     fn min_value() -> Self;
@@ -40,6 +39,8 @@ fn main() {
     let r1 = u8::exhausted_range();
     let r2 = i16::exhausted_range();
 
-    assert!(r1.is_empty());
+    assert_eq!(r1, 255..=0);
     assert!(r2.is_empty());
 }
+
+// TECHNIQUE NAME (again): Trait Default Methods.
