@@ -13,7 +13,7 @@ classDiagram
 
     class usize {
         <<concrete subclass>>
-        +is_odd() bool
+        +is_odd() bool // inherited
     }
 
     UsizeExtensions <|-- usize : is-a

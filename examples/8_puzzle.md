@@ -1,23 +1,31 @@
 # Puzzle 8
 
-We have an `OutputArray<N>` family where every size has the base API, but the `N = 8` variant should have one extra method because it maps cleanly to a `u8` bitmask.
+We have an `OutputArray<N>` superclass with two methods. For `N = 8`, however, we want one extra method because it maps cleanly to a `u8` bitmask.
 
 ```mermaid
 classDiagram
     direction TB
 
-    class OutputArrayN["OutputArray<N>"] {
+    class OutputArrayN["OutputArray~N~"] {
         <<superclass>>
         +new()
         +set_level_at_index(index, level)
     }
 
-    class OutputArray8["OutputArray<8>"] {
+    class OutputArray4["OutputArray~4~"] {
         <<concrete subclass>>
-        +new()
-        +set_level_at_index(index, level)
+        +new() // inherited
+        +set_level_at_index(index, level) // inh.
+    }
+
+    class OutputArray8["OutputArray~8~"] {
+        <<concrete subclass>>
+        +new() // inherited
+        +set_level_at_index(index, level) // inh.
         +set_from_bits(bits)
     }
 
+
+    OutputArrayN <|-- OutputArray4 : is-a
     OutputArrayN <|-- OutputArray8 : is-a
 ```

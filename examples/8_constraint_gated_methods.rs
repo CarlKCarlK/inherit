@@ -1,17 +1,3 @@
-// Mini version of device-envoy's OutputArray pattern.
-//
-// Base impl: methods available for any N.
-// Specialized impl: extra method only for N = 8.
-//
-// Inheritance-like idea:
-//
-// Common variant:
-// - Define a general impl for all T.
-// - Add another impl/methods only when extra bounds hold (for example,
-//   methods that only make sense when T: Display).
-// - All OutputArray<N> values have the base API.
-// - OutputArray<8> has one extra capability.
-
 #[derive(Debug, Clone, Copy)]
 struct OutputArray<const N: usize> {
     levels: [bool; N],
@@ -23,9 +9,7 @@ impl<const N: usize> OutputArray<N> {
     }
 
     fn set_level_at_index(&mut self, index: usize, level: bool) {
-        if let Some(slot) = self.levels.get_mut(index) {
-            *slot = level;
-        }
+        self.levels[index] = level;
     }
 }
 
@@ -38,6 +22,9 @@ impl OutputArray<8> {
         }
     }
 }
+
+// TECHNIQUE NAME: constraint-gated methods.
+// - Methods that only exist when certain constraints are met.
 
 fn main() {
     let mut any = OutputArray::<4>::new();
