@@ -8,13 +8,13 @@ trait Servo {
 
 // `ServoPlayer` is also abstract. It extends `Servo` (supertrait), so any
 // `ServoPlayer` can do everything in `Servo` plus animation.
-// TECHNIQUE NAME: Supertrait Default Methods.
-// (This example shows supertrait-based interface extension.)
+// TECHNIQUE NAME: Supertraits
 trait ServoPlayer: Servo {
     // (degrees, milliseconds to hold at that angle)
     fn animate(&self, steps: &[(u16, u64)]);
 }
 
+#[derive(Default)]
 // Concrete servo driver (similar naming to the real example): `ServoEsp`.
 struct ServoEsp;
 
@@ -24,6 +24,7 @@ impl Servo for ServoEsp {
     }
 }
 
+#[derive(Default)]
 // Concrete servo player driver that can animate.
 struct ServoPlayerEsp;
 
@@ -64,8 +65,8 @@ fn run_wave(player: &impl ServoPlayer) {
 }
 
 fn main() {
-    let servo = ServoEsp;
-    let servo_player = ServoPlayerEsp;
+    let servo = ServoEsp::default();
+    let servo_player = ServoPlayerEsp::default();
 
     center_servo(&servo);
     // `ServoPlayer` can do everything `Servo` can!

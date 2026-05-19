@@ -1,3 +1,10 @@
+// impl usize {
+//     fn is_odd(self) -> bool {
+//         self & 1 != 0
+//     }
+// }
+// error[E0390]: cannot define inherent `impl` for primitive types
+
 trait UsizeExtensions {
     fn is_odd(self) -> bool;
 }

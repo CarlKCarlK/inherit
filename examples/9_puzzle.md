@@ -17,7 +17,13 @@ classDiagram
     }
 
     class TConstrained["T: Serialize + Deserialize"] {
-        <<concrete subclass>>
+        <<subclass>>
+        +serialize() // inherited
+        +deserialize() // inherited
+    }
+
+    class WifiCredentials {
+        <<subclass>>
         +serialize() // inherited
         +deserialize() // inherited
     }
@@ -38,5 +44,6 @@ classDiagram
 
     Serialize <|-- TConstrained : is-a
     Deserialize <|-- TConstrained : is-a
+    TConstrained <|-- WifiCredentials : is-a
     FlashBlock <|-- FlashBlockForTSerializeDeserialize : is-a
 ```

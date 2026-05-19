@@ -25,7 +25,7 @@ macro_rules! impl_integer_ops_num {
 macro_rules! impl_integer_ops_ip {
     ($ip_type:ty, $representation_type:ty) => {
         fn add_one(self) -> Self {
-            <$ip_type>::from(<$representation_type>::from(self).wrapping_add(1))
+            <$ip_type>::from(<$representation_type>::from(self) + 1)
         }
 
         fn min_value() -> Self {
@@ -45,7 +45,7 @@ macro_rules! impl_integer_ops_char {
             if num == 0xD800 {
                 num = 0xE000;
             }
-            char::from_u32(num).unwrap_or(char::MIN)
+            char::from_u32(num).expect("next char must be a valid Unicode scalar value")
         }
 
         fn min_value() -> Self {
@@ -87,6 +87,6 @@ fn main() {
 
     assert_eq!(char::min_value(), char::MIN);
     assert_eq!(char::max_value(), char::MAX);
-    assert_eq!(Ipv4Addr::min_value(), Ipv4Addr::from(0u32));
-    assert_eq!(Ipv4Addr::max_value(), Ipv4Addr::from(u32::MAX));
+    assert_eq!(Ipv4Addr::min_value(), Ipv4Addr::new(0, 0, 0, 0));
+    assert_eq!(Ipv4Addr::max_value(), Ipv4Addr::new(255, 255, 255, 255));
 }

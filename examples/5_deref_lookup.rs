@@ -1,5 +1,11 @@
+// struct HtmlBuffer;
+// impl String for HtmlBuffer {
+// }
+// Error because String is not a trait.
+
 use std::ops::{Deref, DerefMut};
 
+// HtmlBuffer 'wraps' a String
 struct HtmlBuffer(String);
 
 impl HtmlBuffer {
