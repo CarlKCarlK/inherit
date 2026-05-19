@@ -1,26 +1,42 @@
-# Puzzle 6
+# Puzzle 3
 
-We want an `HtmlBuffer` to feel like a string for everyday method calls, while still being its own distinct type. Note that `String` is a concrete type with storage, not just an interface/trait/abstract base class.
+We want to union any number of sets (`RangeSetBlaze<T>`). In OO terms, any collection that is an iterable of `RangeSetBlaze<T>` references should inherit this operation.
 
 ```mermaid
 classDiagram
     direction TB
 
-    class String {
-        <<concrete superclass>>
-        -bytes
-        +push_str()
-        +len()
-        +as_bytes()
+    class Iterable {
+        <<superclass>>
+        +iterator()
     }
 
-    class HtmlBuffer {
+    class RangeSetCollection {
+        <<superclass>>
+        +iterator() // from Iterable
+        +union()
+    }
+
+    class VectorOfRangeSetRefs {
         <<subclass>>
-        +new()
-        +push_str() // inherited
-        +len() // inherited
-        +as_bytes() // inherited
+        +iterator()
+        +union() // inherited
     }
 
-    String <|-- HtmlBuffer : is-a
+    class ArrayOfRangeSetRefs {
+        <<subclass>>
+        +iterator()
+        +union() // inherited
+    }
+
+    class AnyOtherRangeSetCollection {
+        <<subclass>>
+        +iterator()
+        +union() // inherited
+    }
+
+    Iterable <|-- RangeSetCollection : is-a
+    RangeSetCollection <|-- VectorOfRangeSetRefs : is-a
+    RangeSetCollection <|-- ArrayOfRangeSetRefs : is-a
+    RangeSetCollection <|-- AnyOtherRangeSetCollection : is-a
 ```

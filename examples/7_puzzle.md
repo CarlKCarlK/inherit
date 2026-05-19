@@ -1,20 +1,76 @@
-# Puzzle 7
+# Puzzle 5
 
-We want to add a new method `is_odd()` to an existing concrete type `usize`, even though we do not own that type.
+Treat 15 integer-like types uniformly:
+ `u8`, ...,  `usize`, ...`i128`, `char`, `IPv4`, `IPv6`
+ 
+For example, with a `min`, `max`, and ability to add one (unchecked).
 
 ```mermaid
 classDiagram
     direction TB
 
-    class UsizeExtensions {
+    class Integer {
         <<superclass>>
-        +is_odd() bool
+        +add_one()
+        +min_value()
+        +max_value()
     }
 
-    class usize {
-        <<concrete subclass>>
-        +is_odd() bool // inherited
+    class NumericInteger {
+        <<superclass>>
+        +add_one()
+        +min_value()
+        +max_value()
     }
 
-    UsizeExtensions <|-- usize : is-a
+    class IpInteger {
+        <<superclass>>
+        +add_one()
+        +min_value()
+        +max_value()
+    }
+
+    class CharInteger {
+        <<superclass>>
+        +add_one()
+        +min_value()
+        +max_value()
+    }
+
+    class u8 {
+        <<subclass>>
+        +add_one() // inherited
+        +min_value() // inherited
+        +max_value() // inherited
+    }
+
+    class IPv4Type {
+        <<subclass>>
+        +add_one() // inherited
+        +min_value() // inherited
+        +max_value() // inherited
+    }
+
+    class IPv6Type {
+        <<subclass>>
+        +add_one() // inherited
+        +min_value() // inherited
+        +max_value() // inherited
+    }
+
+    class CharType {
+        <<subclass>>
+        +add_one() // inherited
+        +min_value() // inherited
+        +max_value() // inherited
+    }
+
+    Integer <|-- NumericInteger : is-a
+    Integer <|-- IpInteger : is-a
+    Integer <|-- CharInteger : is-a
+
+    NumericInteger <|-- u8 : is-a
+    IpInteger <|-- IPv4Type : is-a
+    IpInteger <|-- IPv6Type : is-a
+    CharInteger <|-- CharType : is-a
 ```

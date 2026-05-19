@@ -1,76 +1,26 @@
-# Puzzle 5
+# Puzzle 6
 
-Treat 15 integer-like types uniformly:
- `u8`, ...,  `usize`, ...`i128`, `char`, `IPv4`, `IPv6`
- 
-For example, with a `min`, `max`, and ability to add one (unchecked).
+We want an `HtmlBuffer` to feel like a string for everyday method calls, while still being its own distinct type. Note that `String` is a concrete type with storage, not just an interface/trait/abstract base class.
 
 ```mermaid
 classDiagram
     direction TB
 
-    class Integer {
-        <<superclass>>
-        +add_one()
-        +min_value()
-        +max_value()
+    class String {
+        <<concrete superclass>>
+        -bytes
+        +push_str()
+        +len()
+        +as_bytes()
     }
 
-    class NumericInteger {
-        <<superclass>>
-        +add_one()
-        +min_value()
-        +max_value()
-    }
-
-    class IpInteger {
-        <<superclass>>
-        +add_one()
-        +min_value()
-        +max_value()
-    }
-
-    class CharInteger {
-        <<superclass>>
-        +add_one()
-        +min_value()
-        +max_value()
-    }
-
-    class u8 {
+    class HtmlBuffer {
         <<subclass>>
-        +add_one() // inherited
-        +min_value() // inherited
-        +max_value() // inherited
+        +new()
+        +push_str() // inherited
+        +len() // inherited
+        +as_bytes() // inherited
     }
 
-    class IPv4Type {
-        <<subclass>>
-        +add_one() // inherited
-        +min_value() // inherited
-        +max_value() // inherited
-    }
-
-    class IPv6Type {
-        <<subclass>>
-        +add_one() // inherited
-        +min_value() // inherited
-        +max_value() // inherited
-    }
-
-    class CharType {
-        <<subclass>>
-        +add_one() // inherited
-        +min_value() // inherited
-        +max_value() // inherited
-    }
-
-    Integer <|-- NumericInteger : is-a
-    Integer <|-- IpInteger : is-a
-    Integer <|-- CharInteger : is-a
-
-    NumericInteger <|-- u8 : is-a
-    IpInteger <|-- IPv4Type : is-a
-    IpInteger <|-- IPv6Type : is-a
-    CharInteger <|-- CharType : is-a
+    String <|-- HtmlBuffer : is-a
 ```

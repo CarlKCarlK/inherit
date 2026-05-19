@@ -1,42 +1,20 @@
-# Puzzle 3
+# Puzzle 7
 
-We want to union any number of sets (`RangeSetBlaze<T>`). In OO terms, any collection that is an iterable of `RangeSetBlaze<T>` references should inherit this operation.
+We want to add a new method `is_odd()` to an existing concrete type `usize`, even though we do not own that type.
 
 ```mermaid
 classDiagram
     direction TB
 
-    class Iterable {
+    class UsizeExtensions {
         <<superclass>>
-        +iterator()
+        +is_odd() bool
     }
 
-    class RangeSetCollection {
-        <<superclass>>
-        +iterator() // from Iterable
-        +union()
+    class usize {
+        <<concrete subclass>>
+        +is_odd() bool // inherited
     }
 
-    class VectorOfRangeSetRefs {
-        <<subclass>>
-        +iterator()
-        +union() // inherited
-    }
-
-    class ArrayOfRangeSetRefs {
-        <<subclass>>
-        +iterator()
-        +union() // inherited
-    }
-
-    class AnyOtherRangeSetCollection {
-        <<subclass>>
-        +iterator()
-        +union() // inherited
-    }
-
-    Iterable <|-- RangeSetCollection : is-a
-    RangeSetCollection <|-- VectorOfRangeSetRefs : is-a
-    RangeSetCollection <|-- ArrayOfRangeSetRefs : is-a
-    RangeSetCollection <|-- AnyOtherRangeSetCollection : is-a
+    UsizeExtensions <|-- usize : is-a
 ```
