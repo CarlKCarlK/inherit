@@ -7,21 +7,21 @@ classDiagram
     direction TB
 
     class Integer {
-        <<superclass>>
+        <<abstract class>>
         +min_value() Self // required
         +max_value() Self // required
         +exhausted_range() RangeInclusive~Self~  // code
     }
 
     class u8 {
-        <<subclass>>
+        <<concrete class>>
         +min_value() Self
         +max_value() Self
         +exhausted_range() RangeInclusive~Self~  // inherited
     }
 
     class i16 {
-        <<subclass>>
+        <<concrete class>>
         +min_value() Self
         +max_value() Self
         +exhausted_range() RangeInclusive~Self~  // inherited

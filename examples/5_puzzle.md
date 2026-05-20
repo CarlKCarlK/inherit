@@ -7,7 +7,7 @@ classDiagram
     direction TB
 
     class String {
-        <<concrete superclass>>
+        <<concrete class>>
         -bytes
         +push_str()
         +len()
@@ -15,7 +15,7 @@ classDiagram
     }
 
     class HtmlBuffer {
-        <<subclass>>
+        <<concrete class>>
         +new()
         +push_str() // inherited
         +len() // inherited

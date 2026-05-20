@@ -10,56 +10,56 @@ classDiagram
     direction TB
 
     class Integer {
-        <<superclass>>
+        <<abstract class>>
         +add_one()
         +min_value()
         +max_value()
     }
 
     class NumericInteger {
-        <<superclass>>
+        <<abstract class>>
         +add_one()
         +min_value()
         +max_value()
     }
 
     class IpInteger {
-        <<superclass>>
+        <<abstract class>>
         +add_one()
         +min_value()
         +max_value()
     }
 
     class CharInteger {
-        <<superclass>>
+        <<abstract class>>
         +add_one()
         +min_value()
         +max_value()
     }
 
     class u8 {
-        <<subclass>>
+        <<concrete class>>
         +add_one() // inherited
         +min_value() // inherited
         +max_value() // inherited
     }
 
     class IPv4Type {
-        <<subclass>>
+        <<concrete class>>
         +add_one() // inherited
         +min_value() // inherited
         +max_value() // inherited
     }
 
     class IPv6Type {
-        <<subclass>>
+        <<concrete class>>
         +add_one() // inherited
         +min_value() // inherited
         +max_value() // inherited
     }
 
     class CharType {
-        <<subclass>>
+        <<concrete class>>
         +add_one() // inherited
         +min_value() // inherited
         +max_value() // inherited

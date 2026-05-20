@@ -8,23 +8,23 @@ classDiagram
     direction TB
 
     class Servo {
-        <<superclass>>
+        <<abstract class>>
         +set_degrees(degrees)
     }
 
     class ServoPlayer {
-        <<superclass>>
+        <<abstract class>>
         +set_degrees(degrees) // from Servo
         +animate(steps)
     }
 
     class ServoEsp {
-        <<subclass>>
+        <<concrete class>>
         +set_degrees(degrees)
     }
 
     class ServoPlayerEsp {
-        <<subclass>>
+        <<concrete class>>
         +set_degrees(degrees)
         +animate(steps)
     }

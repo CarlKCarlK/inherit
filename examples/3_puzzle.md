@@ -7,12 +7,12 @@ classDiagram
     direction TB
 
     class UsizeExtensions {
-        <<superclass>>
+        <<abstract class>>
         +is_odd() bool
     }
 
     class usize {
-        <<concrete subclass>>
+        <<concrete class>>
         +is_odd() bool // inherited
     }
 

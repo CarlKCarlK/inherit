@@ -7,30 +7,30 @@ classDiagram
     direction TB
 
     class Iterable {
-        <<superclass>>
+        <<abstract class>>
         +iterator()
     }
 
     class RangeSetCollection {
-        <<superclass>>
+        <<abstract class>>
         +iterator() // from Iterable
         +union()
     }
 
     class VectorOfRangeSetRefs {
-        <<subclass>>
+        <<concrete class>>
         +iterator()
         +union() // inherited
     }
 
     class ArrayOfRangeSetRefs {
-        <<subclass>>
+        <<concrete class>>
         +iterator()
         +union() // inherited
     }
 
     class AnyOtherRangeSetCollection {
-        <<subclass>>
+        <<concrete class>>
         +iterator()
         +union() // inherited
     }

@@ -7,34 +7,34 @@ classDiagram
     direction TB
 
     class LedLevel {
-        <<subclass>>
+        <<concrete class>>
         On
         Off
     }
 
     class Defaultable {
-        <<superclass>>
+        <<abstract class>>
         +default()
     }
 
     class Debuggable {
-        <<superclass>>
+        <<abstract class>>
         +debug_string()
     }
 
     class EquatableOrdered {
-        <<superclass>>
+        <<abstract class>>
         +equals(other)
         +compare(other)
     }
 
     class Hashable {
-        <<superclass>>
+        <<abstract class>>
         +hash()
     }
 
     class CopyableCloneable {
-        <<superclass>>
+        <<abstract class>>
         +copy()
         +clone()
     }

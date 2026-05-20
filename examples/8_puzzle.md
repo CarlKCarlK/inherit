@@ -7,19 +7,19 @@ classDiagram
     direction TB
 
     class OutputArrayN["OutputArray~N~"] {
-        <<superclass>>
+        <<abstract class>>
         +new()
         +set_level_at_index(index, level)
     }
 
     class OutputArray4["OutputArray~4~"] {
-        <<concrete subclass>>
+        <<concrete class>>
         +new() // inherited
         +set_level_at_index(index, level) // inh.
     }
 
     class OutputArray8["OutputArray~8~"] {
-        <<concrete subclass>>
+        <<concrete class>>
         +new() // inherited
         +set_level_at_index(index, level) // inh.
         +set_from_bits(bits)

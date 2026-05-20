@@ -7,35 +7,35 @@ classDiagram
     direction TB
 
     class Serialize {
-        <<superclass>>
+        <<abstract class>>
         +serialize()
     }
 
     class Deserialize {
-        <<superclass>>
+        <<abstract class>>
         +deserialize()
     }
 
     class TConstrained["T: Serialize + Deserialize"] {
-        <<subclass>>
+        <<abstract class>>
         +serialize() // inherited
         +deserialize() // inherited
     }
 
     class WifiCredentials {
-        <<subclass>>
+        <<concrete class>>
         +serialize() // inherited
         +deserialize() // inherited
     }
 
     class FlashBlock {
-        <<superclass>>
+        <<concrete class>>
         +new()
         +clear()
     }
 
     class FlashBlockForTSerializeDeserialize {
-        <<subclass>>
+        <<concrete class>>
         +new() // inherited
         +clear() // inherited
         +save(value, key)
