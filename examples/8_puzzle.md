@@ -1,6 +1,6 @@
 # Puzzle 8
 
-We have an `OutputArray<N>` superclass with two methods. For `N = 8`, however, we want one extra method because it maps cleanly to a `u8` bitmask.
+We have abstract class `OutputArray<N>` with two methods. For `N = 8`, however, we want one extra method because it maps cleanly to a `u8` bitmask.
 
 ```mermaid
 classDiagram
@@ -8,7 +8,7 @@ classDiagram
 
     class OutputArrayN["OutputArray~N~"] {
         <<abstract class>>
-        +new()
+        +new()s
         +set_level_at_index(index, level)
     }
 
@@ -22,7 +22,7 @@ classDiagram
         <<concrete class>>
         +new() // inherited
         +set_level_at_index(index, level) // inh.
-        +set_from_bits(bits)
+        +set_from_bits(u8)
     }
 
 

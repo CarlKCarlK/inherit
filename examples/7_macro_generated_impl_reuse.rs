@@ -77,6 +77,7 @@ impl Integer for char { impl_integer_ops_char!(); }
 // Can't use num_traits::PrimInt as a 'subclass'
 // because Rust worries that 'char' etc. might
 // be added to it later (coherence).
+// HOWEVER: You could define your own PrimInt with 12 impls.
 
 // TECHNIQUE NAME: macro-generated implementation.
 

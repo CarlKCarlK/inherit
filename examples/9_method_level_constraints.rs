@@ -64,5 +64,10 @@ fn main() -> Result<(), postcard::Error> {
     flash.clear();
     assert!(flash.load::<WifiCredentials>("wifi").is_none());
 
+    // but ... you may not want this behavior.
+    flash.save("number", &42u8)?;
+    let loaded: Option<String> = flash.load("number");
+    assert!(loaded.is_none());
+
     Ok(())
 }

@@ -24,7 +24,9 @@ impl OutputArray<8> {
 }
 
 // TECHNIQUE NAME: constraint-gated methods.
-// - Methods that only exist when certain constraints are met.
+// - Put methods in a separate impl block.
+// - The methods exist only when the impl's constraints are met.
+// - Constraints can be const values, trait bounds, lifetimes, or combinations
 
 fn main() {
     let mut any = OutputArray::<4>::new();
