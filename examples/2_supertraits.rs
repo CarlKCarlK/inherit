@@ -1,7 +1,7 @@
 use std::thread;
 use std::time::Duration;
 
-// `Servo` is an abstract contract (a trait), not a concrete driver.
+// `Servo` is an abstract class (a trait), not a concrete driver.
 trait Servo {
     fn set_degrees(&self, degrees: u16);
 }
@@ -65,12 +65,12 @@ fn run_wave(player: &impl ServoPlayer) {
 }
 
 fn main() {
-    let servo = ServoEsp::default();
-    let servo_player = ServoPlayerEsp::default();
+    let servo_esp = ServoEsp::default();
+    let servo_player_esp = ServoPlayerEsp::default();
 
-    center_servo(&servo);
+    center_servo(&servo_esp);
     // `ServoPlayer` can do everything `Servo` can!
-    center_servo(&servo_player);
+    center_servo(&servo_player_esp);
     // and more.
-    run_wave(&servo_player);
+    run_wave(&servo_player_esp);
 }

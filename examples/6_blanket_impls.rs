@@ -35,11 +35,8 @@ impl RangeSetBlaze {
     }
 }
 
-// A RangeSetCollection is any type that can be turned into an iterator
-// over borrowed RangeSetBlaze values.
-//
-// TECHNIQUE NAME: "blanket implementation".
-// One impl applies to every type that matches the bound.
+// A RangeSetCollection must be iterable over borrowed RangeSetBlaze values.
+// In return, the trait gives it a union() method over those values.
 trait RangeSetCollection<'a>: IntoIterator<Item = &'a RangeSetBlaze> {
     fn union(self) -> RangeSetBlaze
     where
@@ -53,9 +50,11 @@ trait RangeSetCollection<'a>: IntoIterator<Item = &'a RangeSetBlaze> {
     }
 }
 
-// Blanket implementation:
-// Any type that can be turned into an iterator over &RangeSetBlaze
-// automatically implements RangeSetCollection.
+// TECHNIQUE NAME: blanket implementation
+//
+// This is broader than a normal extension trait impl.
+// Instead of adding union() to one type, we add it to every type
+// that can be turned into an iterator over &RangeSetBlaze.
 impl<'a, I> RangeSetCollection<'a> for I where I: IntoIterator<Item = &'a RangeSetBlaze> {}
 
 fn main() {

@@ -64,7 +64,9 @@ fn main() -> Result<(), postcard::Error> {
     flash.clear();
     assert!(flash.load::<WifiCredentials>("wifi").is_none());
 
-    // but ... you may not want this behavior.
+    // This compiles, but it asks for the wrong type.
+// device-envoy stores type-identifying metadata with each value,
+// so this kind of mismatch is likely to be caught at load time.
     flash.save("number", &42u8)?;
     let loaded: Option<String> = flash.load("number");
     assert!(loaded.is_none());
