@@ -1,70 +1,67 @@
-# Rust "Inheritance" Example Roadmap
+# Rust "Inheritance" Examples
 
-todo00 replace all this
+Rust does not have class inheritance. This repo collects nine smaller Rust mechanisms that cover the jobs inheritance often gets used for: behavior reuse, method availability, and polymorphism.
 
-Rust has no class inheritance. Instead, it offers several smaller mechanisms that cover much of what inheritance is often used for: behavior reuse, method availability, and polymorphism.
-
-## Behavior Reuse
+## Roadmap
 
 1. `1_default_methods`
-   File: `examples/1_default_methods.rs`
-   Command: `cargo run --example 1_default_methods`
+   Shows trait default methods as reusable behavior shared by multiple implementors.
+   Run: `cargo run --example 1_default_methods`
 
 2. `2_supertraits`
-   File: `examples/2_supertraits.rs`
-   Command: `cargo run --example 2_supertraits`
+   Shows a supertrait (`ServoPlayer: Servo`) where one capability extends another and can be used anywhere the base trait is required.
+   Run: `cargo run --example 2_supertraits`
 
 3. `3_extension_traits`
-   File: `examples/3_extension_traits.rs`
-   Command: `cargo run --example 3_extension_traits`
-   Note: Once `usize` implements `UsizeExtensions`, values of type `usize` gain the extension methods wherever the trait is in scope.
+   Shows extension traits adding methods to an existing type when inherent impls are not allowed.
+   Run: `cargo run --example 3_extension_traits`
 
 4. `4_derive_generated_impls`
-   File: `examples/4_derive_generated_impls.rs`
-   Command: `cargo run --example 4_derive_generated_impls`
-   Note: `derive` does not inherit behavior; it generates trait implementations.
+   Shows `derive` generating standard trait implementations like `Default`, `Clone`, `Copy`, and ordering traits.
+   Run: `cargo run --example 4_derive_generated_impls`
 
 5. `5_deref_lookup`
-   File: `examples/5_deref_lookup.rs`
-   Command: `cargo run --example 5_deref_lookup`
+   Shows wrapper types exposing methods from an inner type through `Deref` and `DerefMut` lookup.
+   Run: `cargo run --example 5_deref_lookup`
 
 6. `6_blanket_impls`
-   File: `examples/6_blanket_impls.rs`
-   Command: `cargo run --example 6_blanket_impls`
+   Shows a blanket impl adding one shared method to every type that satisfies an iterator-shaped constraint.
+   Run: `cargo run --example 6_blanket_impls`
 
 7. `7_macro_generated_impl_reuse`
-   File: `examples/7_macro_generated_impl_reuse.rs`
-   Command: `cargo run --example 7_macro_generated_impl_reuse`
-
-## Method Availability
+   Shows macros reusing the same trait implementation pattern across many concrete types.
+   Run: `cargo run --example 7_macro_generated_impl_reuse`
 
 8. `8_constraint_gated_methods`
-   File: `examples/8_constraint_gated_methods.rs`
-   Command: `cargo run --example 8_constraint_gated_methods`
-
-## Constraints
+   Shows methods that only exist for specific instantiations of a type, here with a const generic constraint.
+   Run: `cargo run --example 8_constraint_gated_methods`
 
 9. `9_method_level_constraints`
-   File: `examples/9_method_level_constraints.rs`
-   Command: `cargo run --example 9_method_level_constraints`
+   Shows method-level trait bounds so the type stays broadly usable while only selected methods require serialization support.
+   Run: `cargo run --example 9_method_level_constraints`
 
-## Suggested Learning Order
+## Suggested Order
 
-Run them in the order listed.
+Read and run them in numeric order. The first seven focus on behavior reuse patterns, then the last two narrow in on method availability through constraints.
 
 ## Slide Generation
 
-Generate puzzle+solution slides for one example:
+Prerequisites:
+
+- `uv`
+- `npm install`
+- `uv venv`
+- `uv pip install Pillow python-pptx pygments python-pptx-merger`
+
+Generate one walkthrough deck:
 
 - `just generate 3`
 
-This command first runs the matching example (`cargo run --example ...`) and then generates slides.
+Generate the full talk deck:
 
-This writes:
+- `just generate-talk`
 
-- `target/slides/example3_walkthrough.pptx` (for `just generate 3`)
-- `target/slides/rust-inheritance.pptx` (for `just generate-talk`)
+Outputs:
 
-Equivalent direct command:
-
-- `python3 scripts/build_example_slides.py --example 3 --project-root .`
+- `target/slides/example3_walkthrough.pptx`
+- `target/slides/rust-inheritance.pptx`
