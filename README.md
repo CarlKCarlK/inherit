@@ -1,6 +1,9 @@
 # Rust "Inheritance" Examples
 
-Rust does not have class inheritance. This repo collects nine smaller Rust mechanisms that cover the jobs inheritance often gets used for: behavior reuse, method availability, and polymorphism.
+Rust does not have class inheritance. This repo shows nine examples of how how Rust provides the same benefits (shared code, types sharing a role) via other mechnisims.
+
+* [Video](https://www.youtube.com/watch?v=3IyKC5EtNkM) Presentation to the Seattle Rust Users Group
+* [Slides](https://bit.ly/rustinherit)
 
 ## Roadmap
 
@@ -44,7 +47,7 @@ Rust does not have class inheritance. This repo collects nine smaller Rust mecha
 
 Read and run them in numeric order. The first seven focus on behavior reuse patterns, then the last two narrow in on method availability through constraints.
 
-## Slide Generation
+## PowerPoint Slide Generation (via Python)
 
 Prerequisites:
 
