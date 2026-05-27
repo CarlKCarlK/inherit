@@ -1,0 +1,235 @@
+(Transcribed by TurboScribe. Go Unlimited to remove this message.)
+
+Today, I'm going to talk about nine ways to do inheritance in Rust, a language without inheritance. I'm Carl Katie. All the code is in GitHub, and the link is called Inherit.
+
+I'll put it on Discord also. So first things, what do we mean by inheritance? If we're doing an object-oriented class-based language, then we say a subtype can inherit stuff from a supertype. And the kind of stuff it can inherit is an interface.
+
+An interface, well, when two types implement the same interface, that means that we can use either one at a function that requires that interface. So they're substitutable. Another thing that a subtype can get from a supertype is code.
+
+If the supertype implements something, then the subtype will be able to call it. And finally, in some cases, if the supertype has fields, then the subtype will also inherit those fields. So Rust doesn't have class inheritance.
+
+That's certainly true. But it does have tools to get us the effects of the first two. It has shared interfaces, and it has shared behavior.
+
+And we're going to look at those tools. Is anyone else in the meeting? Because I can't see the files. I am in the meeting, and I see Carl, but I also don't see your screen, Carl.
+
+That is a good point. Make one more attempt. I will see.
+
+Start sharing. That looks better. OK.
+
+Yeah, that's it. Let me go over some definitions, because I'm going to be a little loose with vocabulary. When I say interface, if you're familiar with languages like C Sharp, that's equivalent to what C++ calls an abstract class.
+
+Those are roughly equivalent to what Rust calls a trait. And in all these cases, an interface, an abstract class, a trait is a contract or a role. It's not a structure or an enum that you can actually have a value for.
+
+A concrete class corresponds roughly to what Rust calls a structure or an enum. And this is a concrete type. It's something you can create and have values of.
+
+Hopefully, that'll be made a little more clear at the end, or you just have to play with it to get these concepts in your head. My credentials. I've programmed professionally in C++ and in C Sharp.
+
+I've programmed in Python, which normally wouldn't be a credential for this, but I've programmed in Python with lots of classes. And my greatest claim to fame here is that I took a class in Smalltalk, one of the most famous object-oriented languages, and I took it from Ralph Johnson, one of the authors of the Gang of Four Design Patterns book. So I should know what I'm talking about.
+
+We'll see. The format of this is that I'm going to have nine puzzles, things that you might come across when you're programming in Rust that you need to solve. I'll present them first from a class point of view, and then we'll see code in Rust that will solve them.
+
+Discussion is welcome. I think I'm going to say I don't care if we don't get through all the slides. I'll just have a part two or whatever later.
+
+The one exception to that is I don't want us to try to define what object-oriented really means. It's too controversial. So here's the first problem we have.
+
+This is from a crate I have called RangeSetBlaze. So RangeSetBlaze is a data structure that represents sets of integers, like U8s. For it to do that, it needs, but it can work with different kinds of integers, so an i16 or whatever.
+
+To do that, it needs to be able to manipulate the integers. So it needs them to have functions like give me your min value, give me your max value. There's one it wants called create an exhausted range for this integer type.
+
+So if we look at that problem from an object-oriented point of view, we might create a class diagram like this, with an abstract type integer that requires every integer thing to have a min value method, a max value method. And then maybe given those, it can define the exhausted range method for everybody who inherits from it. And then things that might inherit from it would be like our U8 integer, a concrete class.
+
+And it has to make sure it has min, max, and then it'll get exhausted range for free, and likewise for i16. So a quick question to the room, how would we make this happen in Rust? You can just yell out. Traits.
+
+Traits. Traits. And how do we get the exhausted range so we only implement it once? Default implementation.
+
+Default implementation. Just so. So we have a trait.
+
+We call it integer. We say an integer trait has to implement min value and max value. And it also has to implement exhausted range, but we'll actually give a default implementation.
+
+So you don't really have to implement exhausted range. You can do it for free. And then after that, we'll say to implement the integer trait for U8s, here's what you do.
+
+And you have a definition of the min value for U8 and the max value for the U8. We don't have to do exhausted range. For i16, it looks the same.
+
+And now we can use it. We can make R1 equal to an exhausted range of U8s. R2, an exhausted range of i16s.
+
+And then we can verify that R1 is equal to this range that goes from 255 to 0 inclusive, which is the way Rust has ranges that don't have any values inside the range, empty ranges. And in fact, there's a method called empty range on ranges. And we can verify that R2 is indeed an empty range.
+
+So again, that's the trait default method. Good. OK, I've got another crate called device envoy that helps simplify working with microcontrollers.
+
+One thing it wants to manipulate are servos. Servos are electric motors that you can say what angle you want the motor to turn to. So we want to be able to write programs that just use generic servos.
+
+So what do we want those servos to do? Well, a servo has to have a set degrees method, maybe some other methods. And for our particular microcontroller, say our ESP32 family, we'll want a concrete type servo ESP that actually has a specific implementation of set degrees. But we also have this notion of a servo player, which is also abstract.
+
+And a servo player needs to be a servo, but it has additional methods. So say it has an animate method where we can move to a certain angle, wait an amount of time, move to another angle, wait a certain amount of time, and then maybe loop back and forth, animate. And then we'll have a different concrete class for that servo player ESP that should do both those methods.
+
+So to the room, what's the concept that lets us set things up like this in Rust? Connor? I mean, you could make servo player a trait that also requires you to implement servo. Yes, so let's look. I should probably move the microphone over to here.
+
+So that's super traits. So we'll have a trait servo that requires that we have set degrees. We'll have another trait called servo player that requires that we do everything that servo does.
+
+And it has this additional requirement that we implement animate. Now we can have, I've got a little kind of mocked up here, servo ESP. So it'll implement the servo interface for servo ESP.
+
+And in this case, I'm not really going to do hardware. I'm just going to print out a message. This actually surprised me when I was making this.
+
+I forgot how it worked. So servo player ESP is also a concrete thing that it needs to implement both servo and servo player interfaces. I'd forgotten that we need to have two different implementation segments here of code.
+
+So you do. You say, here's how we implement servo for servo player ESP. Set degrees does this.
+
+And here's how we implement animate. And here's some things that we'll pretend we're going through steps. Once we have that, we can write programs that are generic that work for any kind of servo.
+
+So center servo works with any kind of servo. And it sets the degrees to 90. Runwave works with any kind of servo player.
+
+And it calls the player.animate method on a particular set of angles and times. And once we've set this up, we can get what we want. We can say servo ESP lowercase is an instance of servo ESP.
+
+Servo player ESP lowercase is an instance of servo player default. And now we can call center servo on servo ESP. But we can also call it in servo player ESP.
+
+And we can call runwave on servo player ESP. What we can't do is call runwave on the regular servo ESP, because it doesn't know how to do the animate. So good.
+
+We've got that fancy diagram before. And now we've got it all in Rust. I should say, we won't get to anything tricky till 5. This is just trying to understand every which way I could think of to do inheritance like things in Rust.
+
+Problem three. I think people will know this one. We want to add a new method is odd.
+
+But we want to add it to an existing type that's outside of our control usize. So how do we do that? Yes, which we call just by convention. Which we call by convention an extension trait.
+
+So if we think of this in terms of object-orientedness, we'll have an abstract class, usize extensions, that requires is odd function to be defined. And then somehow we'll make usize be an instance of that. That's the only tricky thing, right? This type already exists.
+
+How can we make it a subtype of some supertype that we've just defined ourself? So let's see how to do that. Oh, let me start by saying what doesn't work. If you don't, you would think that maybe you could just say, oh, implement on usize a function called is odd.
+
+And you will get a compiler error that says you're not allowed to implement things on foreign types. In this case, it'll call it a primitive type. But you make this new trait.
+
+You say it's got the is odd. And now the Rust compiler is perfectly happy for you to implement the usize extensions trait on usize and give it a concrete method definition there. So this is extension traits.
+
+And when we do that, we can, say, create a count of 7. And we can assert that count is odd and that it's not the case that 12 is odd. And that all works. One more one that's hopefully not too hard, I wouldn't think.
+
+We have an enum called ledlevel that has two values on and off. We would like it to have a default value. We'd like it to be able to print debug strings.
+
+We'd like to be able to check the equality between two of them. We'd like to be able to put it into one of the standard hash tables. We'd like it to be clonable and copyable.
+
+How can we do that? You can just yell out. You could go through and implement all these traits. What's the most convenient way to do that? Yeah, so the most convenient way to do that, here's our enum, is to use this derive attribute.
+
+And that's giving us all this inheritance, what I think of as inheritance, for free, derive, clone, copy, and so on. And once we've done that, it's got definitions. We can say leddefault is our default level, on, off.
+
+We can check that the default level is off. We can check that on is not equal to off. For some reason, we've, probably without really intending it, but we've decided that off is greater than on.
+
+And we can do some copying and cloning. Question, Carl? Yes, Brad? Why do you think of derive, clone, copy, debug, et cetera, as inheritance? Can you expand on that a little? Well, look at this slide. If you were coming from C++ and said, I want this thing to be a mix-in of all these types, I want it to be a mix-in of the hashable supertype, then this is the way you would think about it.
+
+I think it's a good point, though, that just because maybe I have a tendency to think of things in terms of these hierarchies, because of my background, that we'll start to notice that the Rust way of doing things not only doesn't have the hierarchies, but it's really only using a few building blocks. We called it, two examples back, we called it trait extensions. But we never used the word extension.
+
+As far as the compiler is concerned, that was just a trait. It's only by convention or by our convenience that we give it a name. It's no different than any other trait as far as the Rust compiler is concerned, which is nice.
+
+It means there's a few basic concepts here that are actually doing quite a bit of work and maybe it'll make it easier to remember how to use it. Maybe you won't really have to remember nine cases. OK, this one I'm kind of proud of.
+
+We want HTML buffer to feel like a string for a lot of everyday method calls, but we still want it to be its own type. The trick here is that string is a concrete type with storage. It's not an abstract class interface, whatever.
+
+How can we have HTML buffer inherit from string type when string is a concrete class? You can start a pipe. I said how, not should. I said how, not should.
+
+Yes. Yes. We were going to see one of those traits.
+
+So the answer, yeah. Benny? It's DRef, right? Yes, that's the one I'm going to show. I'm going to show DRef.
+
+There's some other ones we'll list at the end. So this might be an evil thing to do, but it's really cool that you can do it, even if it's evil. So here's what you'd want to do.
+
+You want to say, oh, implement string for HTML buffer. And it's going to say, hey, string's a struct, not a trait. You can't do that.
+
+That's an error. So there's these traits called DRef and DRef mutable. And now we create an HTML buffer struct that has one field, that's field 0 of type string.
+
+That's just the syntax we can use there. So so far, we haven't done everything here. Everyone will agree it's something you should be doing.
+
+So HTML buffer now contains a string. And we're going to give it some of its own methods. We're going to say it's got a new method, and here's how we do the new method.
+
+Everyone thinks that's cool. Now we're going to implement this DRef trait for HTML buffer. And we're going to say it's got a target type of string.
+
+And whenever you are asked to DRef a reference to this HTML buffer, return the stuff at field 0. Return the string itself. And likewise, do the same thing for the mutable one. And now look what we can do.
+
+We can say page is a new HTML buffer page. And now we can say page.pushString. And we can just call the string method on our HTML buffer and push a string in there. And we can do it twice.
+
+And we can ask for its length. You never define length. The reason length is there is because it's defined on string.
+
+You can't do everything. I don't think you can test equality directly. But you can put an asterisk in front of your variable.
+
+And that's asking for the thing that page points to. And then you can put an ampersand in front of that. And that's, say, borrow the thing that you point to.
+
+And now you'll get the thing itself. Everyone agrees that DRef is very good when it's used with smart pointers. So it's used with Box, and RC, and Arc, and so on.
+
+I don't think there's any controversy there. It's probably not a good idea to use it this way here. Because the whole reason I wanted to create an HTML buffer instead of a string, because I could have just used a string type as my HTML buffer.
+
+The whole reason I gave it a new type was that if I got mixed up and put in the wrong thing, I would get a compiler error. And now I'm not going to get a compiler error in a lot of cases because I've made it so permissive. There are some other traits that work in similar but not identical ways, if this is of interest to you.
+
+So you could look at the as ref trait, the from trait, and the borrow trait. All do things that are a little bit similar to this. Puzzle six.
+
+So range set blaze will hold a set of integers. We might have a whole collection of these sets and want to be able to do a union of them, like a vector of range set blazes, and we want to do the union of all of them, or an array of them. If we look at that in terms of object-orientedness, we'd say, OK, a collection, we're going to call that an abstract class called iterable.
+
+A collection, I didn't quite write it down here right, but say it's a collection of integers. A collection of range sets. Specifically, well, that'll be iterable.
+
+I should say it only knows about range sets. I forgot to do that. And it knows how to do a union if we're given seven of these in a list, how to do the union.
+
+That's still abstract. But specifically, if we have a vector of range sets, then we can get the union. Or an array, that's all fine.
+
+That we could just do with the extension traits that we saw before. But we want it to work with any kind of collection, any, we'll say, iterable thing, if we're doing this in Rust. How can we make it work with any iterable, even ones we haven't anticipated? Keywords? What's that? AUDIENCE MEMBER 2 Type eraser.
+
+Type eraser. Maybe. I don't know.
+
+That's not the term I was looking for. So I'm going to look for the term blanket implementation. Way down there.
+
+We'll see if that's the right term. So let's set this up first. I don't really want to bring in my whole range set blaze data structure.
+
+So we're going to make it so the only integer it knows about is U64s, and that it's really just a B-tree set. We'll mock it up for this. And it knows how to create a new range set blaze.
+
+And we'll know how to create one that's empty. We'll know how to get one from just a list of integers. We'll call that from slice.
+
+And we'll tell it how to do the union of two range set blazes, exactly two. And we do that by going, in this case, going back to the B-tree sets and doing the union and then collecting it all together. Oh, and we'll have a predicate, a function that returns a bool.
+
+Is it empty or not? So that's all set up. The next thing we can do is set up basically the same kind of extension trait we did before with a super trait. We can say we're going to define a trait range set collection.
+
+It's going to provide an implementation of union. But it requires that whatever it's being applied to can also do everything that into iter does, which is another type that says you can convert something into an iterator, and specifically an into iter of range set blaze. So if we do all this, then we could do range set extensions to vector and array.
+
+And for an array of these or a vector of these, we could do union. But we want to do more than that. We want it to work for every kind of collectional thing, every iterable thing, even ones we haven't anticipated.
+
+And the way we do that is what I'll call a blanket implementation. And the syntax is that we want to implement range set collection on a generic I, where I is anything that already implements the into iter with an item that's a reference to a range set blaze. And we'll see what you can do with that.
+
+So first we'll create three range set blazes, A, B, and C. And then just so we can check our work, we'll have anticipated what the union of A, B, and C should be. And then if you look at the next one, we can take a vector of A, B, and C vector and then say dot union on it. And we will get the range set blaze that is the union.
+
+And we can see that it's equal to expected as expected. So that's good. And it works with an array.
+
+But it can even work with what I would consider strange iterators. So I was surprised when I found out that the Rust option object can be iterated. So we can create a sum of A. And then we can ask to iterate through all its values, which will only be one.
+
+And anything that we iterate, we can filter. And then we can do some tests to see whether we would like this or not. And even though this is a really weird type, it's a filter of an option, we can still call dot union on it.
+
+And it'll compile because we did this blanket implementation. Here's one that I faced in range set blaze. I wanted to treat all 15 integer-like things uniformly.
+
+So that's what I'll call the numeric integers, U8, U size up to I128, but also the Unicode characters and the two IP address types. So for all these, because I want to be able to keep them in my set thing, I want to be able to maybe get the min and the max. And maybe I need to be able to add one to an integer or an integer-like thing.
+
+So in terms of a class diagram, we'd say we have an abstract integer. And then we have some kind of numeric integers. And for those, we have a way that we know about to add one and get a min value and a max value.
+
+And we also have internet protocol address integers. And maybe they have a different way than the numeric ones for adding one and for getting the min and the max, but maybe in common with themselves. And the Unicode characters will be off by themselves.
+
+And then we have specific concrete classes that would implement each of these. So if you had to do this, if you wanted to find these three methods on all 15 classes, what would you do? So one idea is to use an enum. The thing here is we need to work with these existing types.
+
+These are all system types. So we can't create our own type that's U8, U16, and enum. Any other suggestions? Yeah.
+
+AUDIENCE MEMBER 2 I want to use macros. Sorry. AUDIENCE MEMBER 2 Macros? Macros is what I'm going to use.
+
+I'm not confident now that it's the best solution, but it is the one I really used. And we'll talk about why I used it. So I'm going to use macros as suggested.
+
+So we have a trait integer. It's got to be able to add one, min value, and max value. And now with macros, you can do anything, right? So I'm going to make a macros just for knowing numeric types.
+
+And for that one, it'll say, oh, you can add one by just adding one. There's a constant called min. There's a constant called max.
+
+That's how we get our min and max value. That looks pretty good. For the IPs, we're going to pass in two types to the macro, the IP type and also its numeric representation type.
+
+And the way we add one is we convert it to its numeric representation, add one numerically, and then convert back to our IP type. And then for min, since we know its numerical representation, we can ask the numerical representation's min type and convert that into the IP type. We're set.
+
+I don't know, since there's only one character type I'm working with, I needed to make a macro. But I did anyway. For Unicode characters, adding one is particularly tricky.
+
+We convert it to its numerical representation type, which is a U32. We add one. But there's this range of U32s in the middle of Unicode that aren't allowed to be used.
+
+So if we find ourselves at the edge of that illegal, invalid range, then we skip over it and then convert back into character. And then actually, min value and max value are similar to the numeric, because unlike the IP types, character does have the min and max constants defined. And then we just do a whole bunch.
+
+We do 15 implements, calling our macro. And I mean, there's a lot of different ways that you could arrange with macros. You could have had them anyway.
+
+And this is fine. And this is what I do in range set Blaze. So the question is, isn't there some trait that all these types already have? And the answer to that is no.
+
+But all 12 of the numeric ones do have a trait in a third-party crate called numTraits called primint, primitive integer. So why didn't I just use numTraits primitive integer? And then I wouldn't have to do this macro stuff. I could just do an extension on primitive integer.
+
+And does anyone know why that doesn't work? So there's a problem with coherence. And specifically, because the numTraits crate is external to me, I don't know that in the future they're not going to add Unicode characters to it. And that means that if I've got an implementation for the numeric integers, and say the character integer and they're distinct.
+
+(This file is longer than 30 minutes. Go Unlimited at https://turboscribe.ai/ to transcribe files up to 10 hours long.)

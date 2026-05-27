@@ -53,8 +53,10 @@ def render_mermaid_png(
     out_png: Path,
     workdir: Path,
     explicit_mmdc_path: str | None,
+    theme: str,
 ) -> None:
-    init_block = """%%{init: {
+    if theme == "dark":
+        init_block = """%%{init: {
   "theme": "base",
   "themeVariables": {
     "background": "#0B0F14",
@@ -65,6 +67,15 @@ def render_mermaid_png(
     "tertiaryColor": "#0F172A"
   }
 }}%%"""
+        background = "transparent"
+    elif theme == "medium":
+        # Mermaid's default theme gives the light lavender class diagram style
+        # that reads well in Medium's white article body.
+        init_block = """%%{init: {"theme": "default"}}%%"""
+        background = "white"
+    else:
+        raise ValueError(f"Unknown Mermaid theme: {theme}")
+
     if "%%{init:" not in mermaid_text:
         mermaid_text = f"{init_block}\n{mermaid_text}"
 
@@ -82,7 +93,7 @@ def render_mermaid_png(
             "-o",
             str(out_png),
             "-b",
-            "transparent",
+            background,
             "-p",
             str(temp_pptr),
         ]
@@ -387,6 +398,7 @@ def main() -> None:
     title, prose, mermaid = extract_markdown_parts(puzzle_md)
 
     mermaid_png = output_dir / f"{args.example}_puzzle_diagram.png"
+    medium_mermaid_png = output_dir / f"{args.example}_puzzle_diagram_medium.png"
     code_png = output_dir / f"{args.example}_solution_code.png"
     out_pptx = output_dir / f"example{args.example}_walkthrough.pptx"
 
@@ -399,7 +411,14 @@ def main() -> None:
         if existing != mermaid_png:
             mermaid_png.write_bytes(existing.read_bytes())
     else:
-        render_mermaid_png(mermaid, mermaid_png, root, args.mmdc_path)
+        render_mermaid_png(mermaid, mermaid_png, root, args.mmdc_path, theme="dark")
+        render_mermaid_png(
+            mermaid,
+            medium_mermaid_png,
+            root,
+            args.mmdc_path,
+            theme="medium",
+        )
     render_rust_code_png(solution_code, code_png)
     build_ppt(
         title,

@@ -1,0 +1,139 @@
+(Transcribed by TurboScribe. Go Unlimited to remove this message.)
+
+Here's one that I faced in range set blaze. I wanted to treat all 15 integer-like things uniformly. So that's what I'll call the numeric integers, U8, U size, up to I128.
+
+But also the Unicode characters and the two IP address types. So for all these, because I want to be able to keep them in my set thing, I want to be able to maybe get the min and the max, and maybe I need to be able to add one to an integer, or an integer-like thing. So in terms of a class diagram, we'd say we have an abstract integer, and then we have some kind of numeric integers.
+
+And for those, we have a way that we know about to add one and get a min value and a max value. And we also have internet protocol address integers, and maybe they have a different way than the numeric ones for adding one and for getting the min and the max, but maybe in common with themselves. And the Unicode characters will be off by themselves.
+
+And then we have specific concrete classes that would implement each of these. So if you had to do this, if you wanted to define these three methods on all 15 classes, what would you do? AUDIENCE MEMBER 2 So the one idea is to use an enum. The thing here is we need to work with these existing types.
+
+These are all system types. So we can't create our own type that's UA, U16, and enum. Any other suggestions? Yeah? AUDIENCE MEMBER 3 I want to use macros.
+
+Sorry. Macros? Macros is what I'm going to use. I'm not confident now that it's the best solution, but it is the one I really used, and we'll talk about why I used it.
+
+So I'm going to use macros as suggested. So we have a trait integer. It's got to be able to add one, min value, and max value.
+
+And now with macros, you can do anything, right? So I'm going to make a macros just for knowing numeric types. And for that one, it'll say, oh, you can add one by just adding one. There's a constant called min.
+
+There's a constant called max. That's how we get our min and max value. That looks pretty good.
+
+For the IPs, we're going to pass in two types to the macro, the IP type and also its numeric representation type. And the way we add one is we convert it to its numeric representation, add one numerically, and then convert back to our IP type. Likewise, oh, and then for min, since we know its numerical representation, we can ask the numerical representation's min type and convert that into the IP type.
+
+We're set. I don't know, since there's only one character type I'm working with, I needed to make a macro. But I did anyway.
+
+For Unicode characters, adding one is particularly tricky. We convert it to its numerical representation type, which is a U32. We add one.
+
+But there's this range of U32s that aren't in the middle of Unicode that aren't allowed to be used. So if we find ourselves at the edge of that illegal invalid range, then we skip over it. And then convert back into character.
+
+And then actually, min value and max value are similar to the numeric, because unlike the IP types, character does have the min and max constants defined. And then we just do a whole bunch. We do 15 implements, calling our macro.
+
+And I mean, there's a lot of different ways that you could arrange with macros. You could have had them anyway. And this is fine.
+
+And this is what I do in range set ablaze. So the question is, isn't there some trait that all these types already have? And the answer to that is no. But all 12 of the numeric ones do have a trait in a third-party crate called numTraits, called primint, primitive integer.
+
+So why didn't I just use numTraits primitive integer? And then I wouldn't have to do this macro stuff. I could just do an extension on primitive integer. And does anyone know why that doesn't work? So there's a problem with coherence.
+
+And specifically, because the numTraits crate is external to me, I don't know that in the future they're not going to add Unicode characters to it. And that means that if I've got an implementation for the numeric integers and, say, the character integer, and they're distinct, but in the future, who's ever controlling my definition of this primitive integer could put my character in there and now we've got overlapping classes, which Rust doesn't like. Having said that, I could have just created my own primint type and just had 15 lines assigning it.
+
+And it would be about the same amount of code as using macros. So I don't know that using macros is better or worse than that. They're about the same amount of code.
+
+The thing I like about macros is when the going gets rough, you can always just use a macro. Just to show that this works, if x is the U8 254, then we can add 1, 255. If it's the Unicode character A, we can add 1. That's normally not allowed.
+
+I mean, add 1 isn't something you normally can do with characters, but we can do that now. And we can get the min value of characters, something that was defined. But we can also get the min values of the IP addresses, which there's no constant that defines those in the standard library.
+
+And now we've got it. Here's one that I didn't know you could do. So I've got this output array.
+
+And it's an array of Booleans of fixed length. So abstractly, we're going to consider this generic thing, an abstract class, output array of size n. And we know how to create a new one that will be set to all false. And we know how to set the level at a particular index position 0 to n minus 1 to either true or false.
+
+That's what the abstract class is. Our concrete class would be something like output array for a particular length. And we can use those two methods on it.
+
+But we also want output array, when it's exactly length 8, to have yet another method defined called setFromBits from a U8, where it goes through and takes all the bits of the U8. Does anyone know how we're allowed to do this? AUDIENCE MEMBER 2 Just use the two different input blocks. What's generic and what is not? Yeah.
+
+I had no idea that this worked. So the answer is, in general, you can have constraints when you do implementations, including having a specific constant set. So in general, output array is not a trait.
+
+It's a structure, a generic structure. So it's still kind of abstract. And in general, when n is just n, we define new and setLevel.
+
+But we can also have a whole new second input block that says, specifically when it's 8, you can define this setFromBits. And it works great. You can set 8 from bits, and it works.
+
+And it doesn't just have to be generics. I'll get to that in just a second so I don't lose my place. You can also have trait bounds.
+
+There's some lifetime things you can do. You can have some combinations. Yes? AUDIENCE MEMBER 3 Yeah, so how do you have something like that not getCalled if your number isn't 8? The compiler will say, I don't know what function you're trying to call.
+
+There's no such thing as setFromBits on this thing, because this thing has to have a specific length by the time you call it in the code. AUDIENCE MEMBER 3 So you'd have to go back and rewrite your code to get that? Yeah, yeah. I mean, just like, right? I mean, you might have just said something blah, blah, and you've never defined blah, blah.
+
+It's the same message you'd get. The compiler doesn't know where you got that name from. It thinks you're crazy that you'd even think that you could call that method.
+
+AUDIENCE MEMBER 3 Does it not give you a hint at all? I don't know. I don't know. I have no idea.
+
+AUDIENCE MEMBER 3 It tells you the method doesn't exist. Yeah, I bet that's all. Because they're really, it can't, well, I don't know.
+
+AUDIENCE MEMBER 3 It does say that I'm wrong. Oh, OK. So that's good.
+
+That'll let you go and see what's different. Puzzle 9 got a little small. So for device envoy, I want to be able to write kind of arbitrary values to the flash memory.
+
+So each block of flash memory, 4K block of flash memory is going to have a new and a clear method. But if I have a type that is serializable, I also want to be able to save and load that type into a flash block. But if I created a type that's not serializable, then you can't save and load into it, where serializable is two traits, or abstract classes on this slide serialize and deserialize.
+
+So how would you go about having this work? Yes, I'm going to do it a different way. So that suggestion was to constrain an implementation to require these traits, which is this idea of what we saw in the previous slide. I'm going to do something different.
+
+We'll see what's bad and good about what I'm going to do instead. So first, let's set up something we might want to serialize is Wi-Fi credentials. Our flash block, I'm not going to do the whole flash stuff.
+
+I'm just going to make it a hash map from a key into a vector of bytes. And a flash block has an implementation of new and of clear that works all the time, no constraints. And in the same info block, I'm going to define save.
+
+But save is only defined when the thing being saved implements the trait serialize and deserialize to an owned value, and likewise for load. And this does work pretty great. Let me just show you how it works, and then I'll show you how it works in a way that you might not expect and may or may not want.
+
+So we're going to create a new flash block, new. We'll create some credentials. And then we'll, to the flash block, save under the key word Wi-Fi our credentials.
+
+So they're saved. Now we're going to take that same flash memory, and we will load the things that we saved under the key Wi-Fi. If it wasn't there, we'll get a none.
+
+But if it is there, we'll get some. And our value of the credentials type, I'm just going to assume we got it. So we're going to unwrap and then verify that we got our types out of it.
+
+So that's great. Let's look what also works. In the same flash block that I've cleared but nothing else, I can save 42 as a U8 under the key word number.
+
+Well, that's weird. I thought we were only going to be saving credentials in this flash block. But no, we can save anything in this flash block, any type that's serializable.
+
+And even worse, we can load number but tell it we want to load a string. And this isn't a compiler error. This is fine.
+
+When you actually run this right now, you'll get a none value, because when it tries to deserialize 42 as a string, it'll tell that there's something going wrong there. And it turns the error into a none. But that's not guaranteed.
+
+It's possible that you, I don't know, wrote out an array of U8s and then asked for a U128. And it thinks that looks all fine. And it would just give you the wrong value.
+
+So in the case I'm really using this in Device Envoy, this is what I want. But along with saving the values, I also save some metadata, which is like the name of the type. So at least if you ask for a type with a different name than the type that was stored, it'll promise to give you back none.
+
+But that's still not perfectly guaranteed to be type safe. If you wanted it to be more type safe, you can do what we saw before, which is for each block, make it work with only one type in particular. And that's just a choice you have to make whether you want the semantics that your flash blocks can only save one type of thing or not.
+
+OK. So this is the final slide. Let's just review what we saw.
+
+We saw we could have traits with default methods. We can add multiple levels of traits, like super traits, which let us have our servo player that could act like a servo. We can have extension traits, which are really just traits, that let us add methods to foreign types.
+
+When they're common things like clone and debug, there's a nice pre-built macros for us. If we want to be bad and inherit from a concrete type, we can kind of do it using dref. Maybe we shouldn't do that.
+
+When we want to make what I kind of think of as extension types, but for all things that would qualify past some test, not just the ones you anticipated, then you can do a blanket implementation that we saw before. Or when nothing else works, and especially if the number of things you want to work with is finite, in my case, 15, you can just use macros to make your code as short as possible. With constants or even traits, you can gate an implementation block so these functions are only defined if the test passes, or even on the method level within an implementation, you can gate them so they only are defined when a particular test.
+
+And yeah, as I said at the beginning, what I thought was cool about this is I came into it thinking, oh, here's nine-ish different ways to do inheritance and whatever. And it's going to be hard to remember all the different Rust ways to do it. But there's really only a few concepts we've seen here.
+
+And the only things to me that are a little bit tricky is the things having to do with coherence and the rules that don't let you kind of do what you might want to do with a foreign function. And we see the workarounds for that. So any comments or discussion, questions? Yeah? Something I thought of at that last example where you can serialize as one format and then deserialize as a different one, if you wanted to constrain it so that each block could only serialize and deserialize one type, that would be a good use case for phantom data, which is a type in the standard library, where you can actually store the generic type that you want to use inside that model.
+
+But it's not actually being stored. It's just the type name is being stored essentially. So Betty suggested that you could use phantom data to actually store the type, not like what I was doing, which was like some hash of the name of the type or something, and that it might be able to get you real true type checking.
+
+That's interesting. Zero size as well. Yeah, and if you did that, it would be zero size.
+
+It would just be stuff checked by the compiler. Thank you, sir. One more, and then we'll be done.
+
+There's one other kind of inheritance you can do, which is even more cursed than some of the other ones you've done, which is use the any type and downcast. Yes, I didn't even think of that. I've never used it.
+
+I've never used it. I will look that up. Thank you.
+
+Oh, sorry, Mark. I was also surprised that you can dynamically test something and have pointers to any types for the underlying type just to fill some amount of space. I don't know if that would count, though, as a case.
+
+Yeah, it- I don't know if that would count in slides, either. Right, I had to kind of limit what I was going to do. So the comment was, there's also this notion, say you want to- I do something with audio clips in Device Envoy, where an audio clip can be a compressed sound, an uncompressed sound, or it can be a tone that's just played algorithmically, or it can be silence.
+
+And I want to have an array of those. And you can't have a normal array of different types that all have different sizes, but you can if you use the dynamic types, which adds an indirection, very similar to what C++ does with its vtable stuff. What I like about Rust is I almost never have to do that.
+
+Whereas my C++ was always doing it, apparently, without really needing to. Maybe sometimes the compiler makes it go away. But in here, I only do it when I really do need to have a heterogeneous collection or something.
+
+And it turns out, in a lot of my use cases at least, I don't need that, and that everything is called directly with no indirection. So I guess it's faster. That's type erasure.
+
+Yeah, that's type erasure. OK, done. Thank you.
+
+(Transcribed by TurboScribe. Go Unlimited to remove this message.)
