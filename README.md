@@ -3,7 +3,7 @@
 Rust does not have class inheritance. This repo shows nine examples of how how Rust provides the same benefits (shared code, types sharing a role) via other mechanisms.
 
 * Article: [Nine Ways to Do Inheritance in Rust, a Language Without Inheritance](https://medium.com/@carlmkadie/nine-ways-to-do-inheritance-in-rust-a-language-without-inheritance-14825bf1e215) 
-* Video [Presentation to the Seattle Rust Users Group](https://www.youtube.com/watch?v=3IyKC5EtNkM)
+* Video: [Presentation to the Seattle Rust Users Group](https://www.youtube.com/watch?v=3IyKC5EtNkM)
 * [Slides](https://bit.ly/rustinherit)
 
 ## Roadmap
