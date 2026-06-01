@@ -1,19 +1,26 @@
 // Alternative solution without macros.
-// Uses local supertraits PrimInt and PrimIp to share logic,
-// with explicit impls for all 15 types.
+// Each type explicitly implements Integer and selects a shared family via an
+// associated type. No blanket impls of Integer, so no coherence overlap.
 
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::ops::Add;
 
-trait Integer: Copy + Ord {
-    fn add_one(self) -> Self;
-    fn min_value() -> Self;
-    fn max_value() -> Self;
+trait IntegerOps<T> {
+    fn add_one(value: T) -> T;
+    fn min_value() -> T;
+    fn max_value() -> T;
 }
 
-// A local supertrait for the 12 numeric primitive integer types.
-// Can't use num_traits::PrimInt as a 'supertrait' for a blanket impl
-// because Rust worries that 'char' etc. might be added to it later (coherence).
+trait Integer: Copy + Ord {
+    type Ops: IntegerOps<Self>;
+
+    fn add_one(self) -> Self   { Self::Ops::add_one(self) }
+    fn min_value() -> Self     { Self::Ops::min_value() }
+    fn max_value() -> Self     { Self::Ops::max_value() }
+}
+
+// ── PrimIntOps ────────────────────────────────────────────────────────────────
+
 trait PrimInt: Copy + Ord + Add<Output = Self> {
     const ONE: Self;
     const MIN: Self;
@@ -33,14 +40,20 @@ impl PrimInt for u128  { const ONE: Self = 1; const MIN: Self = u128::MIN;  cons
 impl PrimInt for isize { const ONE: Self = 1; const MIN: Self = isize::MIN; const MAX: Self = isize::MAX; }
 impl PrimInt for usize { const ONE: Self = 1; const MIN: Self = usize::MIN; const MAX: Self = usize::MAX; }
 
-// A local supertrait for the IP address types.
+struct PrimIntOps;
+
+impl<T: PrimInt> IntegerOps<T> for PrimIntOps {
+    fn add_one(value: T) -> T  { value + T::ONE }
+    fn min_value() -> T        { T::MIN }
+    fn max_value() -> T        { T::MAX }
+}
+
+// ── PrimIpOps ─────────────────────────────────────────────────────────────────
+
 trait PrimIp: Copy + Ord {
     type Repr: PrimInt;
     fn to_repr(self) -> Self::Repr;
     fn from_repr(repr: Self::Repr) -> Self;
-    fn ip_add_one(self) -> Self { Self::from_repr(self.to_repr() + <Self::Repr as PrimInt>::ONE) }
-    fn ip_min() -> Self { Self::from_repr(<Self::Repr as PrimInt>::MIN) }
-    fn ip_max() -> Self { Self::from_repr(<Self::Repr as PrimInt>::MAX) }
 }
 
 impl PrimIp for Ipv4Addr {
@@ -55,40 +68,47 @@ impl PrimIp for Ipv6Addr {
     fn from_repr(repr: u128) -> Self { Ipv6Addr::from(repr) }
 }
 
-// A local supertrait for char.
-trait PrimChar {
-    fn char_add_one(self) -> Self;
-    fn char_min() -> Self;
-    fn char_max() -> Self;
+struct PrimIpOps;
+
+impl<T: PrimIp> IntegerOps<T> for PrimIpOps {
+    fn add_one(value: T) -> T  { T::from_repr(value.to_repr() + T::Repr::ONE) }
+    fn min_value() -> T        { T::from_repr(T::Repr::MIN) }
+    fn max_value() -> T        { T::from_repr(T::Repr::MAX) }
 }
 
-impl PrimChar for char {
-    fn char_add_one(self) -> char {
-        let mut num = u32::from(self) + 1;
+// ── CharOps ───────────────────────────────────────────────────────────────────
+
+struct CharOps;
+
+impl IntegerOps<char> for CharOps {
+    fn add_one(value: char) -> char {
+        let mut num = u32::from(value) + 1;
         if num == 0xD800 { num = 0xE000; }
         char::from_u32(num).expect("next char must be a valid Unicode scalar value")
     }
-    fn char_min() -> char { char::MIN }
-    fn char_max() -> char { char::MAX }
+    fn min_value() -> char { char::MIN }
+    fn max_value() -> char { char::MAX }
 }
 
-impl Integer for i8    { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for u8    { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for i16   { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for u16   { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for i32   { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for u32   { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for i64   { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for u64   { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for i128  { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for u128  { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for isize { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for usize { fn add_one(self) -> Self { self + <Self as PrimInt>::ONE } fn min_value() -> Self { <Self as PrimInt>::MIN } fn max_value() -> Self { <Self as PrimInt>::MAX } }
-impl Integer for Ipv4Addr { fn add_one(self) -> Self { self.ip_add_one() } fn min_value() -> Self { Self::ip_min() } fn max_value() -> Self { Self::ip_max() } }
-impl Integer for Ipv6Addr { fn add_one(self) -> Self { self.ip_add_one() } fn min_value() -> Self { Self::ip_min() } fn max_value() -> Self { Self::ip_max() } }
-impl Integer for char     { fn add_one(self) -> Self { self.char_add_one() } fn min_value() -> Self { Self::char_min() } fn max_value() -> Self { Self::char_max() } }
+// ── Integer impls: one per type, just selects the Ops family ──────────────────
 
-// TECHNIQUE NAME: local supertraits with explicit impls.
+impl Integer for i8    { type Ops = PrimIntOps; }
+impl Integer for u8    { type Ops = PrimIntOps; }
+impl Integer for i16   { type Ops = PrimIntOps; }
+impl Integer for u16   { type Ops = PrimIntOps; }
+impl Integer for i32   { type Ops = PrimIntOps; }
+impl Integer for u32   { type Ops = PrimIntOps; }
+impl Integer for i64   { type Ops = PrimIntOps; }
+impl Integer for u64   { type Ops = PrimIntOps; }
+impl Integer for i128  { type Ops = PrimIntOps; }
+impl Integer for u128  { type Ops = PrimIntOps; }
+impl Integer for isize { type Ops = PrimIntOps; }
+impl Integer for usize { type Ops = PrimIntOps; }
+impl Integer for Ipv4Addr { type Ops = PrimIpOps; }
+impl Integer for Ipv6Addr { type Ops = PrimIpOps; }
+impl Integer for char     { type Ops = CharOps; }
+
+// TECHNIQUE NAME: associated-type ops selection.
 
 fn main() {
     let x: u8 = 254;
@@ -100,3 +120,4 @@ fn main() {
     assert_eq!(Ipv4Addr::min_value(), Ipv4Addr::new(0, 0, 0, 0));
     assert_eq!(Ipv4Addr::max_value(), Ipv4Addr::new(255, 255, 255, 255));
 }
+
