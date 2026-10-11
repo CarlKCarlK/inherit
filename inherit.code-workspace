@@ -4,10 +4,10 @@
 			"path": "."
 		},
 		{
-			"path": "../mcu/device-envoy"
+			"path": "../../mcu/device-envoy"
 		},
 		{
-			"path": "../range-set-blaze"
+			"path": "../../range-set-blaze"
 		}
 	],
 	"settings": {}
